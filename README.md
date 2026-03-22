@@ -17,7 +17,7 @@ content are the same thing: the self-documenting loop is closed.
   from the repo via MCP during authoring
 - **VS Code extension** (`lac-lens`) — inline feature status badges and hover
   context while editing source files
-- **Feature schema** (`@life-as-code/feature-schema`) — all 22 features validate
+- **Feature schema** (`@life-as-code/feature-schema`) — all 26 features validate
   against the shared schema (schemaVersion 1)
 - **lifeascode web app** — the hosted counterpart; this repo is the local,
   source-of-truth side of the same workflow
@@ -63,7 +63,7 @@ no Vercel dashboard settings needed.
    Leave everything as-is and click **Deploy**.
 
 That's it. Vercel assigns a `*.vercel.app` URL on first deploy. Every push to
-`main` redeploys automatically.
+`master` redeploys automatically.
 
 ### Deploy via CLI
 
@@ -96,7 +96,7 @@ the DNS instructions. No code changes needed.
 
 ## Feature tree structure
 
-22 features arranged in a depth-first tree rooted at `feat-2026-001`:
+26 features arranged in a depth-first tree rooted at `feat-2026-001`:
 
 ```
 feat-2026-001  Why I Built This                  (root, frozen)
@@ -112,9 +112,13 @@ feat-2026-001  Why I Built This                  (root, frozen)
 │       ├── feat-2026-011  lac-claude integration
 │       ├── feat-2026-012  feature-schema package
 │       └── feat-2026-013  lifeascode web app
-└── feat-2026-022  Life Decisions as Code        (concept, active)
-    ├── feat-2026-017  Career pivot example
-    └── feat-2026-018  Relocation example
+├── feat-2026-022  Life Decisions as Code        (concept, frozen)
+│   ├── feat-2026-017  Career pivot example
+│   └── feat-2026-018  Relocation example
+└── feat-2026-023  MCP-Assisted Feature Authoring  (frozen)
+    ├── feat-2026-024  The Loop Closes — MCP Full Tool Surface
+    ├── feat-2026-025  Tool path not resolved on Windows
+    └── feat-2026-026  Claude + MCP — Freeze the Whole Ecosystem
 ```
 
 Feature data is loaded at build time via `import.meta.glob('../**/feature.json',
