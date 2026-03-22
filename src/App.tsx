@@ -2,6 +2,10 @@ import { useState, useEffect, useMemo, useRef } from 'react'
 import { loadFeatures, buildTree } from './features'
 import type { Feature, FeatureNode } from './types'
 import About from './about/About'
+import McpAuthoring from './mcp-authoring/McpAuthoring'
+import McpChild from './mcp-child/McpChild'
+import McpBugTrace from './mcp-authoring/bugs/tool-path-resolution/McpBugTrace'
+import McpClaudeSession from './mcp-claude-session/McpClaudeSession'
 import { FeatureGraph } from './graph/FeatureGraph'
 import './App.css'
 
@@ -244,6 +248,11 @@ function FeatureCard({
                   <p>{node.successCriteria}</p>
                 </section>
               )}
+
+              {node.featureKey === 'feat-2026-023' && <McpAuthoring />}
+              {node.featureKey === 'feat-2026-024' && <McpChild />}
+              {node.featureKey === 'feat-2026-025' && <McpBugTrace />}
+              {node.featureKey === 'feat-2026-026' && <McpClaudeSession />}
             </div>
           )}
         </article>
@@ -318,17 +327,25 @@ export default function App() {
       return next
     })
 
-  // ── focus context: ancestors (dimmed less) + focused feature's children (fully focused) ─
+  // ── focus context: ancestors (dimmed less) + focused feature's descendants (fully focused) ─
   const focusAncestorKeys = useMemo((): Set<string> => {
     if (!focusKey) return new Set()
     const ancs = getAncestors(focusKey, byKey)
     return new Set(ancs.map((a) => a.featureKey))
   }, [focusKey, byKey])
 
-  const focusChildKeys = useMemo((): Set<string> => {
+  const focusDescendantKeys = useMemo((): Set<string> => {
     if (!focusKey) return new Set()
-    const children = childrenMap.get(focusKey) ?? []
-    return new Set(children.map((c) => c.featureKey))
+    const result = new Set<string>()
+    const queue = [focusKey]
+    while (queue.length) {
+      const key = queue.pop()!
+      for (const child of childrenMap.get(key) ?? []) {
+        result.add(child.featureKey)
+        queue.push(child.featureKey)
+      }
+    }
+    return result
   }, [focusKey, childrenMap])
 
   // ── visible tree: full tree minus collapsed sub-trees ────
@@ -439,7 +456,7 @@ export default function App() {
               focusState={
                 !focusKey
                   ? 'normal'
-                  : node.featureKey === focusKey || focusChildKeys.has(node.featureKey)
+                  : node.featureKey === focusKey || focusDescendantKeys.has(node.featureKey)
                   ? 'focused'
                   : focusAncestorKeys.has(node.featureKey)
                   ? 'context'

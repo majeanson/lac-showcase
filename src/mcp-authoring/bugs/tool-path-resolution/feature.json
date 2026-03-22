@@ -1,0 +1,58 @@
+{
+  "featureKey": "feat-2026-025",
+  "title": "Tool path not resolved on Windows",
+  "status": "frozen",
+  "problem": "Relative paths passed to MCP tools fail on Windows due to backslash normalization",
+  "schemaVersion": 1,
+  "domain": "tooling",
+  "tags": [
+    "mcp",
+    "ai-assisted",
+    "authoring",
+    "lac",
+    "claude"
+  ],
+  "lineage": {
+    "parent": "feat-2026-023",
+    "spawnReason": "bug: Windows path separator breaks resolvePath"
+  },
+  "analysis": "The lac-mcp server uses Node's path.resolve() to normalize paths, but on Windows, relative paths with backslashes are mishandled when mixed with the forward-slash conventions assumed throughout the codebase. The bug surfaces in resolvePath() — a shared utility called by every tool handler that accepts a path argument.",
+  "implementation": "McpBugTrace.tsx renders the 10-tool call sequence from the parent session (feat-2026-023) that produced this child, mirroring McpChild.tsx structure but capturing the new tools: get_feature_status, roadmap_view, spawn_child_feature, feature_changelog, cross_feature_impact, and audit_decisions. Injected into FeatureCard when featureKey === 'feat-2026-025'.",
+  "decisions": [
+    {
+      "decision": "Track the Windows path bug as a child feature rather than an inline annotation on the parent",
+      "rationale": "Bugs requiring investigation and a discrete fix deserve their own lifecycle — spawn_child_feature exists precisely for this, giving the bug its own statusHistory and surfacing it if it rots.",
+      "alternativesConsidered": [
+        "Add a knownLimitations entry on the parent — loses traceability of the fix",
+        "Open a GitHub issue only — external tracker not linked to provenance"
+      ],
+      "date": "2026-03-22"
+    },
+    {
+      "decision": "Reuse the McpChild.tsx trace component pattern for the bug child",
+      "rationale": "The trace format is already styled and understood by readers — consistency across feat-2026-023, 024, and 025 reinforces it as a convention rather than a one-off.",
+      "alternativesConsidered": [
+        "Plain prose implementation field — loses step-by-step call visibility"
+      ],
+      "date": "2026-03-22"
+    }
+  ],
+  "successCriteria": "McpBugTrace.tsx renders correctly inside the feat-2026-025 FeatureCard with all 10 tool calls shown with accurate args, results, and NEW badges.",
+  "knownLimitations": [
+    "The actual Windows path fix is not yet implemented — this feature documents triage, not the patch",
+    "isNew badges reflect novelty relative to feat-2026-024, not an absolute distinction"
+  ],
+  "priority": 3,
+  "statusHistory": [
+    {
+      "from": "draft",
+      "to": "active",
+      "date": "2026-03-22"
+    },
+    {
+      "from": "active",
+      "to": "frozen",
+      "date": "2026-03-22"
+    }
+  ]
+}

@@ -201,6 +201,166 @@
   }
 }
 
+/* ── MCP Authoring section ───────────────────────────────── */
+
+.mcp-authoring-section {
+  padding: 40px max(20px, calc((100% - 860px) / 2));
+  border-top: 1px solid var(--border-soft);
+}
+
+.mcp-authoring-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+
+.mcp-authoring-body {
+  max-width: 640px;
+  margin-bottom: 32px;
+}
+
+.mcp-authoring-lead {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.mcp-authoring-body p {
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0 0 10px;
+}
+
+.mcp-authoring-body code {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  background: var(--surface-raised);
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: var(--accent);
+}
+
+/* ── Tool call trace ────────────────────────────────────── */
+
+.mcp-trace {
+  border: 1px solid var(--border-soft);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.mcp-trace-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 10px 16px;
+  background: var(--surface-raised);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.mcp-trace-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mcp-trace-item {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.mcp-trace-item:last-child {
+  border-bottom: none;
+}
+
+.mcp-trace-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.mcp-trace-index {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  min-width: 20px;
+}
+
+.mcp-trace-tool {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.mcp-trace-args {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+  padding-left: 30px;
+}
+
+.mcp-trace-arg {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-soft);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.mcp-trace-arg-key {
+  color: var(--text-muted);
+}
+
+.mcp-trace-arg-val {
+  color: var(--text-primary);
+}
+
+.mcp-trace-result {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--status-active, #3a6b3e);
+  padding-left: 30px;
+  margin-bottom: 6px;
+}
+
+.mcp-trace-note {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text-secondary);
+  padding-left: 30px;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+.mcp-trace-badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 3px;
+  padding: 1px 5px;
+  margin-left: 8px;
+  opacity: 0.8;
+}
+
 /* ── Breadcrumb ─────────────────────────────────────────── */
 
 .breadcrumb {

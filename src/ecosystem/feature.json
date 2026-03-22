@@ -2,51 +2,18 @@
   "featureKey": "feat-2026-006",
   "title": "LAC Ecosystem Overview",
   "status": "frozen",
-  "problem": "Visitors who understand what life-as-code is still don't know what the ecosystem looks like in practice — what tools exist, how they relate to each other, and which one to reach for. Without a map of the packages and apps, the workflow feels like an abstract idea rather than something they can actually adopt.",
+  "problem": "Visitors who understand life-as-code still don't know what tools exist, how they relate, or which one to reach for.",
   "schemaVersion": 1,
-  "analysis": "The LAC ecosystem has three deployment surfaces: the CLI (npm), the VS Code extension (Marketplace), and the web app (Vercel). Under the hood, several internal packages power them — the schema, the LSP, the MCP server, and the Claude integration. Visitors don't need to understand all of them to get started, but they do need a map that shows the entry points and how the pieces connect. Each package gets its own child feature with its own decisions and context — this overview is the index that ties them together.",
+  "analysis": "The LAC ecosystem spans three deployment surfaces — CLI (npm), VS Code extension (Marketplace), and web app (Vercel) — backed by internal packages for schema, LSP, MCP, and Claude integration. This overview is the index node; child features fill in the per-package territory.",
   "decisions": [
-    {
-      "decision": "One child feature per package/app, this feature as their shared parent",
-      "rationale": "Each package has its own problem, decisions, and tradeoffs that deserve independent documentation. The ecosystem overview is the index — it explains the shape of the map; the children fill in the territory.",
-      "alternativesConsidered": [
-        "One long feature with all packages — loses the per-package decision context, hard to navigate",
-        "No overview, just individual package features — visitors have no entry point to understand how the pieces relate"
-      ],
-      "date": "2026-03-21"
-    },
-    {
-      "decision": "Ecosystem overview frozen once all 7 package children are complete and rendering in the tree",
-      "rationale": "All package features (007-013) are filled, frozen, and visible as an indented sub-tree. The thread-toggle on this card lets visitors collapse the entire package detail in one click.",
-      "alternativesConsidered": [],
-      "date": "2026-03-21"
-    }
+    {"decision": "One child feature per package/app, this feature as their shared parent","rationale": "Each package has its own decisions and tradeoffs deserving independent documentation — this overview explains the shape while children fill in the detail.","alternativesConsidered": ["One long feature with all packages — loses per-package context","No overview, just individual package features — no entry point for the full map"],"date": "2026-03-21"},
+    {"decision": "Ecosystem overview frozen once all 7 package children are complete and rendering in the tree","rationale": "All package features (007-013) are filled, frozen, and visible as an indented sub-tree with a thread-toggle to collapse them in one click.","alternativesConsidered": [],"date": "2026-03-21"}
   ],
-  "tags": [
-    "ecosystem",
-    "packages",
-    "overview",
-    "lac",
-    "index"
-  ],
-  "lineage": {
-    "parent": "feat-2026-004",
-    "children": [
-      "feat-2026-007",
-      "feat-2026-008",
-      "feat-2026-009",
-      "feat-2026-010",
-      "feat-2026-011",
-      "feat-2026-012",
-      "feat-2026-013"
-    ],
-    "spawnReason": "The what-is-LAC explainer introduces the concept; the ecosystem overview is the natural next step — here's what you can actually install and use."
-  },
-  "knownLimitations": [
-    "Overview becomes stale whenever a new package is added and a child feature isn't spawned to match"
-  ],
-  "successCriteria": "The ecosystem overview renders in the feature tree as a parent of all individual package features. A visitor reading top-to-bottom can follow the LAC concept → ecosystem map → individual package deep-dives.",
+  "tags": ["ecosystem","packages","overview","lac","index"],
+  "lineage": {"parent": "feat-2026-004","children": ["feat-2026-007","feat-2026-008","feat-2026-009","feat-2026-010","feat-2026-011","feat-2026-012","feat-2026-013"],"spawnReason": "The what-is-LAC explainer introduces the concept; this is the natural next step — here's what you can install."},
+  "knownLimitations": ["Overview becomes stale when a new package is added without a matching child feature"],
+  "successCriteria": "The ecosystem overview renders as parent of all package features, and a visitor reading top-to-bottom can follow the LAC concept → ecosystem map → individual package deep-dives.",
   "domain": "documentation",
-  "implementation": "feat-2026-006 is a content-only feature — no dedicated UI component. It renders as a feature card in the tree at depth 2 (child of feat-2026-004, grandchild of feat-2026-001). Its 7 child features (feat-2026-007 through 013) appear indented beneath it at depth 3, each with their own domain badge, tags, and full expanded content. The thread-toggle on this card collapses all 7 package cards in one click, letting visitors skip the ecosystem detail if they only care about the high-level story. The feature serves as the index node — its analysis field describes the map; the children fill in the territory.",
+  "implementation": "No code — content-only feature. Renders as a feature card at depth 2; its 7 child features appear indented at depth 3. The thread-toggle collapses all 7 package cards in one click.",
   "priority": 1
 }

@@ -2,71 +2,21 @@
   "featureKey": "feat-2026-015",
   "title": "Full Feature Integration Sprint",
   "status": "frozen",
-  "problem": "The app currently renders a basic feature tree but none of the designed features are actually built: the About section is static, the design system tokens aren't fully applied, lineage collapse/expand doesn't exist, the ecosystem overview has no visual treatment, and focus/navigation mode is unimplemented. The feature.json files describe what to build — now the app needs to catch up to its own documentation.",
+  "problem": "The app renders a basic feature tree but none of the designed features are actually built — the feature.json files describe what to build and the app needs to catch up.",
   "schemaVersion": 1,
-  "analysis": "The feature.json files across the project are the implementation spec. Each feature's status field drives the work queue: active = build it now, draft = spec only, frozen = locked, deprecated = skip. The integration sprint works through every active feature in dependency order — design tokens first (feat-2026-003), then app shell improvements (feat-2026-002), then About section (feat-2026-004), then ecosystem section (feat-2026-006 + children), then lineage collapse (feat-2026-005), then navigation/focus mode (feat-2026-014). Each feature becomes a testable increment: build it, verify against its successCriteria, mark done.",
+  "analysis": "The feature.json files are the implementation spec; each feature's status field drives the work queue. The sprint works through every active feature in dependency order — design tokens first, then app shell improvements, About section, ecosystem features, lineage collapse, then focus/navigation mode. Each feature becomes a testable increment verified against its successCriteria.",
   "decisions": [
-    {
-      "decision": "Work in dependency order, not feature-key order",
-      "rationale": "Design tokens (003) must land before any component styling. Collapse behaviour (005) must land before focus mode (014) builds on top of it. Building out of order creates rework.",
-      "alternativesConsidered": [
-        "Alphabetical/key order — ignores dependencies",
-        "All at once — impossible to test incrementally"
-      ],
-      "date": "2026-03-21"
-    },
-    {
-      "decision": "Use each feature's successCriteria as the acceptance test",
-      "rationale": "The successCriteria field was written to be specific and testable. Using it as the definition of done closes the loop between documentation and implementation.",
-      "alternativesConsidered": [
-        "Ad-hoc testing — no clear completion signal",
-        "Separate test spec — duplicates what's already in the feature.json"
-      ],
-      "date": "2026-03-21"
-    },
-    {
-      "decision": "successCriteria rendered in the expanded card view",
-      "rationale": "Makes the app self-describing — visitors can see not just what was built but how we knew it was done. The showcase shows its own acceptance criteria.",
-      "alternativesConsidered": [
-        "Only internal / not rendered — wastes the field for showcase purposes"
-      ],
-      "date": "2026-03-21"
-    },
-    {
-      "decision": "types.ts extended with successCriteria and domain fields",
-      "rationale": "Both fields are present in the feature.json files. Exposing them in the TypeScript interface ensures they're rendered in the card and type-checked at build time.",
-      "alternativesConsidered": [
-        "Keep types narrow, access via JSON cast — loses type safety"
-      ],
-      "date": "2026-03-21"
-    },
-    {
-      "decision": "features.ts dead code (byKey, rooted variables) removed during integration",
-      "rationale": "The integration sprint is a natural point to fix known issues documented in feat-2026-002's knownLimitations. Removing dead code is zero-risk during a full rewrite of the consuming component.",
-      "alternativesConsidered": [
-        "Leave it — tech debt grows; the knownLimitations field already called it out"
-      ],
-      "date": "2026-03-21"
-    }
+    {"decision": "Work in dependency order, not feature-key order","rationale": "Design tokens must land before component styling, and collapse behaviour must land before focus mode builds on top of it — building out of order creates rework.","alternativesConsidered": ["Alphabetical/key order — ignores dependencies","All at once — impossible to test incrementally"],"date": "2026-03-21"},
+    {"decision": "Use each feature's successCriteria as the acceptance test","rationale": "successCriteria was written to be specific and testable — using it as the definition of done closes the loop between documentation and implementation.","alternativesConsidered": ["Ad-hoc testing — no clear completion signal","Separate test spec — duplicates what's already in feature.json"],"date": "2026-03-21"},
+    {"decision": "successCriteria rendered in the expanded card view","rationale": "Makes the app self-describing — visitors can see not just what was built but how we knew it was done.","alternativesConsidered": ["Only internal / not rendered — wastes the field for showcase purposes"],"date": "2026-03-21"},
+    {"decision": "types.ts extended with successCriteria and domain fields","rationale": "Both fields are present in feature.json files — exposing them in the TypeScript interface ensures they render and are type-checked at build time.","alternativesConsidered": ["Keep types narrow, access via JSON cast — loses type safety"],"date": "2026-03-21"},
+    {"decision": "features.ts dead code (byKey, rooted variables) removed during integration","rationale": "The integration sprint is the natural point to fix known issues already documented in feat-2026-002's knownLimitations.","alternativesConsidered": ["Leave it — tech debt grows; knownLimitations already called it out"],"date": "2026-03-21"}
   ],
-  "implementation": "Integration order:\n1. feat-2026-003 — apply all CSS design tokens to index.css and App.css\n2. feat-2026-002 — About component wired into App.tsx above the feature list\n3. feat-2026-004 — About section styled with design tokens, links verified\n4. feat-2026-006..013 — ecosystem features rendered in the tree; no special UI needed beyond correct lineage\n5. feat-2026-005 — collapse/expand toggle on parent cards, child-count badge on collapsed parents\n6. feat-2026-014 — focus mode via ?focus= URL param, breadcrumb component, collapse-all scoped shortcut\nEach increment is verified against the feature's successCriteria before moving to the next.",
-  "knownLimitations": [
-    "No automated test suite — successCriteria verification is manual visual inspection"
-  ],
-  "successCriteria": "Every active feature in the project renders correctly in the running app. Design tokens are applied consistently. The About section appears above the feature list. Collapse/expand works on any feature with children. Focus mode isolates a feature + ancestors + children via ?focus= URL. The ecosystem sub-tree (feat-2026-006 through 013) is navigable.",
-  "tags": [
-    "integration",
-    "sprint",
-    "implementation",
-    "all-features"
-  ],
-  "lineage": {
-    "parent": "feat-2026-002",
-    "spawnReason": "The app shell gave the app a runnable scaffold; this sprint is what makes that scaffold showcase-worthy — wiring every designed feature into the live app.",
-    "children": [
-      "feat-2026-019"
-    ]
-  },
+  "implementation": "Integration order: (1) feat-2026-003 CSS design tokens, (2) feat-2026-002 About component wired into App.tsx, (3) feat-2026-004 About section styled, (4) feat-2026-006..013 ecosystem features in tree, (5) feat-2026-005 collapse/expand, (6) feat-2026-014 focus mode via ?focus= URL param. Each increment verified against successCriteria before proceeding.",
+  "knownLimitations": ["No automated test suite — successCriteria verification is manual visual inspection"],
+  "successCriteria": "Every active feature renders correctly in the running app with design tokens applied, About section above the feature list, working collapse/expand, working focus mode via ?focus=, and the ecosystem sub-tree fully navigable.",
+  "tags": ["integration","sprint","implementation","all-features"],
+  "lineage": {"parent": "feat-2026-002","spawnReason": "The app shell gave a runnable scaffold; this sprint wires every designed feature into the live app.","children": ["feat-2026-019"]},
   "domain": "frontend",
   "priority": 3
 }

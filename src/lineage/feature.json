@@ -2,68 +2,24 @@
   "featureKey": "feat-2026-005",
   "title": "Lineage Tree and Story Focus",
   "status": "frozen",
-  "problem": "The feature list shows all entries in a flat-ish tree, but visitors have no way to understand parent/child relationships visually or to skip sub-stories they don't care about. A reader who only wants the top-level decisions is forced to scroll past every spawned child, and a reader who wants the full thread has no clear visual guide for following it.",
+  "problem": "Visitors have no way to understand parent/child relationships visually or skip sub-stories they don't care about — the app forces linear scroll through everything.",
   "schemaVersion": 1,
-  "analysis": "Parent features act as chapter headings — their children are the supporting detail. A collapse affordance on any parent lets readers hide its entire sub-tree in one click. The collapsed state lives in React component state (not URL), so it resets on reload — intentional, since the default reading experience should show everything. Visual connectors (an indented left border or subtle tree line) make the parent/child relationship legible without needing labels. A collapsed parent shows a child-count badge so the reader knows what they're skipping.",
+  "analysis": "Parent features act as chapter headings with collapse affordances that hide entire sub-trees in one click. Collapse state lives in React component state (not URL) so it resets on reload — intentional, since the default experience should show everything. A collapsed parent shows a child-count badge so readers know what they're skipping.",
   "decisions": [
-    {
-      "decision": "Collapse entire sub-tree when a parent is collapsed, not just direct children",
-      "rationale": "A reader skipping a story wants to skip the whole thread, not just one level. Collapsing only direct children forces repeated clicks and leaves grandchildren visible.",
-      "alternativesConsidered": [
-        "Collapse one level at a time — more granular but tedious for deep trees",
-        "Hide button per card — too granular, no sense of the thread being skipped"
-      ],
-      "date": "2026-03-21"
-    },
-    {
-      "decision": "Ephemeral collapse state (component state, not URL or localStorage)",
-      "rationale": "The default experience should always show the full story. Persisting collapsed state would hide content from returning visitors without them realising it.",
-      "alternativesConsidered": [
-        "localStorage — persists across sessions, risks permanently hiding content",
-        "URL params — shareable but adds complexity for a simple reading preference"
-      ],
-      "date": "2026-03-21"
-    },
-    {
-      "decision": "Child-count badge on collapsed parents",
-      "rationale": "Readers need to know what they're skipping. A badge like '▸ 3' makes the collapse feel intentional rather than like missing content.",
-      "alternativesConsidered": [
-        "No badge — ambiguous, reader may think the tree is just shallow",
-        "Expand/collapse all global toggle — useful addition later, too broad for v1"
-      ],
-      "date": "2026-03-21"
-    },
-    {
-      "decision": "Collapsed state hides child cards only — the parent card always shows its full content (revised by feat-2026-016)",
-      "rationale": "Originally the card itself minimised to title-only when collapsed. feat-2026-016 removed this: the card body (problem, tags, spawn-reason) is always visible. Minimising the card confused readers who expected to see what they were skipping past.",
-      "alternativesConsidered": [
-        "Hide problem/tags/spawn-reason on collapsed parent (original behaviour) — removed, made collapsed cards feel like broken stubs"
-      ],
-      "date": "2026-03-21"
-    }
+    {"decision": "Collapse entire sub-tree when a parent is collapsed, not just direct children","rationale": "A reader skipping a story wants to skip the whole thread — collapsing only direct children forces repeated clicks and leaves grandchildren visible.","alternativesConsidered": ["Collapse one level at a time — tedious for deep trees","Hide button per card — no sense of the thread being skipped"],"date": "2026-03-21"},
+    {"decision": "Ephemeral collapse state (component state, not URL or localStorage)","rationale": "The default experience should always show the full story — persisting collapsed state would hide content from returning visitors without them realising it.","alternativesConsidered": ["localStorage — risks permanently hiding content","URL params — shareable but adds complexity for a simple reading preference"],"date": "2026-03-21"},
+    {"decision": "Child-count badge on collapsed parents","rationale": "Readers need to know what they're skipping — a badge like '▸ 3' makes the collapse feel intentional rather than like missing content.","alternativesConsidered": ["No badge — ambiguous, reader may think tree is shallow","Expand/collapse all global toggle — too broad for v1"],"date": "2026-03-21"},
+    {"decision": "Collapsed state hides child cards only — the parent card always shows its full content (revised by feat-2026-016)","rationale": "Originally the card minimised to title-only when collapsed, but feat-2026-016 removed this because it confused readers who expected to see what they were skipping.","alternativesConsidered": ["Hide problem/tags/spawn-reason on collapsed parent — made collapsed cards feel like broken stubs"],"date": "2026-03-21"}
   ],
-  "tags": [
-    "lineage",
-    "tree",
-    "collapse",
-    "ux",
-    "navigation"
-  ],
-  "lineage": {
-    "parent": "feat-2026-003",
-    "children": [
-      "feat-2026-014",
-      "feat-2026-021"
-    ],
-    "spawnReason": "The design system established visual tokens; now the tree structure needs interaction design — collapse/expand behaviour and lineage connectors are a natural next layer on top of the existing card layout."
-  },
+  "tags": ["lineage","tree","collapse","ux","navigation"],
+  "lineage": {"parent": "feat-2026-003","children": ["feat-2026-014","feat-2026-021"],"spawnReason": "Design system established visual tokens; collapse/expand and lineage connectors are the natural next layer."},
   "knownLimitations": [
-    "Collapse state resets on reload — deep readers who carefully curated their view lose it on refresh",
-    "No keyboard shortcut to collapse/expand a sub-tree — requires mouse click on the toggle",
-    "Child-count badge only counts direct children, not the full recursive depth of the hidden sub-tree"
+    "Collapse state resets on reload — carefully curated views are lost on refresh",
+    "No keyboard shortcut to collapse/expand a sub-tree",
+    "Child-count badge counts only direct children, not the full recursive depth"
   ],
-  "successCriteria": "Any feature with children shows a collapse toggle. Clicking it hides the entire sub-tree and shows a badge with the number of hidden stories. Clicking again restores them. Features with no children show no toggle.",
+  "successCriteria": "Any feature with children shows a collapse toggle; clicking it hides the entire sub-tree with a hidden-count badge, and clicking again restores them.",
   "domain": "ux",
-  "implementation": "Collapse state is a Set<string> of collapsed featureKeys held in App component state, initialised on mount with every key that has children (so the tree starts fully collapsed — see feat-2026-016). On each render, visibleTree walks the full tree and checks whether any ancestor of each node is in collapsedKeys — if so, the node is omitted from the rendered list. The collapse toggle (▾ / ▸ N) lives in the .card-gutter div to the left of the card (feat-2026-016), and appears on any FeatureCard whose descendantCount > 0. Toggling adds or removes the key from collapsedKeys. The card itself always renders its full content (title, problem, tags) regardless of collapsed state — collapse only controls child visibility, not the card body.",
+  "implementation": "Collapse state is a Set<string> of collapsed featureKeys in App component state, initialised with every key that has children so the tree starts fully collapsed. visibleTree walks the full tree and omits nodes whose ancestor is in collapsedKeys. The collapse toggle lives in .card-gutter to the left of the card and appears on any FeatureCard with descendantCount > 0.",
   "priority": 1
 }

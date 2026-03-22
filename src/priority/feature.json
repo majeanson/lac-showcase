@@ -2,49 +2,22 @@
   "featureKey": "feat-2026-019",
   "title": "Feature Priority — Ordering and Importance Signalling",
   "status": "frozen",
-  "problem": "Features in a tree have no explicit ordering — they render in scan/insertion order, which has no semantic meaning. Visitors can't tell which features are foundational vs incidental, and tools can't sort siblings meaningfully. Without a priority field, the tree is a flat list that buries important context.",
+  "problem": "Features render in insertion order with no semantic meaning — visitors can't tell which are foundational vs incidental, and tools can't sort siblings meaningfully.",
   "schemaVersion": 1,
-  "lineage": {
-    "parent": "feat-2026-015",
-    "spawnReason": "The integration sprint exposed that features in the tree had no semantic ordering — priority is a first-class schema field, not a rendering concern, so it was spawned as its own story."
-  },
-  "analysis": "Priority is an integer 1–5 where 1 = highest. It controls sibling ordering in every rendering surface: the CLI lineage tree, the MCP get_lineage output, and the web app tree view. Features without a priority sort last (treated as 9999 internally). The field is optional and backward-compatible — existing features without it continue to work, they just sort by updated date. Priority is intentionally separate from completeness score: score measures how well a feature is documented; priority measures how important it is relative to its siblings.",
+  "lineage": {"parent": "feat-2026-015","spawnReason": "Integration sprint exposed that features had no semantic ordering — priority is a first-class schema field, not a rendering concern."},
+  "analysis": "Priority is an integer 1–5 (1 = highest) controlling sibling order in every rendering surface: CLI lineage tree, MCP get_lineage output, and web app tree view. Features without priority sort last (treated as 9999 internally). Priority is intentionally separate from completeness score: score measures documentation quality; priority measures sibling importance.",
   "decisions": [
-    {
-      "decision": "Integer 1–5 over a semantic enum (critical/high/medium/low/trivial)",
-      "rationale": "Integers sort deterministically with no ambiguity. An enum requires mapping to a sort key anyway, adds a layer of indirection, and two features at 'high' have undefined relative order.",
-      "alternativesConsidered": [
-        "Enum — cleaner to read but non-deterministic sort among same-level peers",
-        "Float 0.0–1.0 — false precision, no human-scale meaning"
-      ],
-      "date": "2026-03-21"
-    },
-    {
-      "decision": "Sort: priority ASC NULLS LAST, then updatedAt DESC",
-      "rationale": "Unset features fall to the end rather than the front — opt-in semantics. Within the same priority, recency breaks ties so active work surfaces first.",
-      "alternativesConsidered": [
-        "NULLS FIRST — would force all legacy features to the top, breaking existing trees"
-      ],
-      "date": "2026-03-21"
-    },
-    {
-      "decision": "Add priority to feature-schema, db schema, validators, and all rendering surfaces atomically",
-      "rationale": "A half-implemented field is worse than no field — the schema, the CLI, the MCP, and the web app all need to agree on the same contract at the same time.",
-      "alternativesConsidered": [
-        "Incremental rollout — creates a window where the field exists in schema but isn't used anywhere"
-      ],
-      "date": "2026-03-21"
-    }
+    {"decision": "Integer 1–5 over a semantic enum (critical/high/medium/low/trivial)","rationale": "Integers sort deterministically with no ambiguity — an enum requires a sort-key mapping anyway and leaves same-level peers in undefined relative order.","alternativesConsidered": ["Enum — cleaner to read but non-deterministic sort","Float 0.0–1.0 — false precision, no human-scale meaning"],"date": "2026-03-21"},
+    {"decision": "Sort: priority ASC NULLS LAST, then updatedAt DESC","rationale": "Unset features fall to the end rather than the front — opt-in semantics, with recency breaking ties so active work surfaces first.","alternativesConsidered": ["NULLS FIRST — forces all legacy features to the top, breaking existing trees"],"date": "2026-03-21"},
+    {"decision": "Add priority to feature-schema, db schema, validators, and all rendering surfaces atomically","rationale": "A half-implemented field is worse than no field — schema, CLI, MCP, and web app must all agree on the same contract simultaneously.","alternativesConsidered": ["Incremental rollout — creates a window where the field exists but isn't used anywhere"],"date": "2026-03-21"}
   ],
-  "tags": [
-    "priority",
-    "ordering",
-    "schema",
-    "ux",
-    "meta"
+  "tags": ["priority","ordering","schema","ux","meta"],
+  "implementation": "priority: z.number().int().min(1).max(5).optional() added to FeatureSchema in both lac-cli and lifeascode feature-schema packages. DB column: smallint('priority') with idx_features_priority index. Migration: 0006_add_priority.sql. tRPC setPriority mutation mirrors setScore; list queries ORDER BY priority ASC NULLS LAST, updatedAt DESC. Web app build-tree.ts: sortByPriorityThenDate replaces sortDesc. CLI and MCP sort children by priority before rendering.",
+  "knownLimitations": [
+    "Priority without bounds breaks sibling sort",
+    "No linting rule enforces priority range"
   ],
-  "implementation": "priority: z.number().int().min(1).max(5).optional() added to FeatureSchema in both lac-cli and lifeascode feature-schema packages. DB column: smallint('priority') with idx_features_priority index. Migration: 0006_add_priority.sql. tRPC: setPriority mutation mirrors setScore; listRootFeatures and getFeatureChildren now ORDER BY priority ASC NULLS LAST, updatedAt DESC. Web app build-tree.ts: sortByPriorityThenDate replaces sortDesc. CLI lineage.ts: children.sort() by priority before rendering ASCII tree. MCP index.ts: priority shown in formatFeatureSummary as P1/5–P5/5; buildLineageTree sorts children by priority.",
-  "successCriteria": "Running lac lineage feat-2026-001 shows children in priority order. The web app tree renders siblings sorted by priority. Features without priority sort last. Setting priority via the web app or MCP persists and immediately reorders the tree.",
+  "successCriteria": "Running lac lineage feat-2026-001 shows children in priority order, the web app tree renders siblings sorted by priority, and features without priority sort last.",
   "domain": "schema",
   "priority": 5
 }

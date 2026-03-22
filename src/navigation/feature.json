@@ -2,67 +2,24 @@
   "featureKey": "feat-2026-014",
   "title": "Story Navigation and Focus Mode",
   "status": "frozen",
-  "problem": "Readers get lost in deep feature trees. Once you've drilled into a child story, there's no quick way to hop back up to the parent thread, collapse sibling noise, or isolate just the slice of the tree you care about. The app currently forces a linear scroll through everything — it has no concept of where you are or where you want to go.",
+  "problem": "Once readers drill into a child story, there's no quick way to hop back up, collapse sibling noise, or isolate just the slice of the tree they care about.",
   "schemaVersion": 1,
-  "analysis": "Three distinct navigation gestures address three different reader postures. 'Hop up' is for the reader who followed a thread too deep and wants back to the parent context — a breadcrumb or back button that jumps one level up the lineage chain. 'Collapse thread' (from feat-2026-005) handles dismissal of sub-trees the reader actively doesn't want. 'Focus mode' is the most powerful: it isolates a single feature and its direct lineage (ancestors + children) as the only visible content, dimming or hiding everything else — like clearing the desk to work on one thing. Together they let readers navigate a feature tree the way a reader navigates a book: by chapter, not by scrolling the full manuscript.",
+  "analysis": "Three navigation gestures address three reader postures: 'hop up' via breadcrumb, 'collapse thread' from feat-2026-005, and 'focus mode' which dims or hides everything outside the focal feature + its ancestors + direct children. Together they let readers navigate a feature tree by chapter, not by scrolling the full manuscript.",
   "decisions": [
-    {
-      "decision": "Focus mode dims non-focal cards in place rather than filtering the visible set to only focused + ancestors + children",
-      "rationale": "Keeping all cards in the DOM preserves the spatial layout and lets the reader see the full tree shape while still drawing clear attention to the focal card. Filtering to a subset (the original v1 approach) collapsed the tree too aggressively and removed useful peripheral context.",
-      "alternativesConsidered": [
-        "Filter visibleTree to focused + ancestors + children only (original implementation) — removed spatial context, felt like a mode switch rather than a zoom"
-      ],
-      "date": "2026-03-21"
-    },
-    {
-      "decision": "Breadcrumb trail as the primary 'hop up' affordance",
-      "rationale": "A breadcrumb renders the full ancestor path (e.g. feat-001 › feat-005 › feat-014) and lets readers click any ancestor to re-focus on that level. One click to go up one level, or skip directly to the root.",
-      "alternativesConsidered": [
-        "Back button (browser history style) — only goes to the last visited node, not the parent in the tree",
-        "Up arrow button — suggests a single step, doesn't show the full path"
-      ],
-      "date": "2026-03-21"
-    },
-    {
-      "decision": "Focus state lives in URL (query param ?focus=feat-2026-014)",
-      "rationale": "Unlike collapse state (ephemeral), focus is a meaningful reading position worth sharing. A URL-encoded focus lets readers bookmark or share the exact slice they care about.",
-      "alternativesConsidered": [
-        "Component state only — not shareable, resets on reload",
-        "localStorage — persists but not shareable, can confuse returning visitors"
-      ],
-      "date": "2026-03-21"
-    },
-    {
-      "decision": "history.replaceState instead of pushState for URL sync",
-      "rationale": "Focus changes are navigation within the same view, not new history entries. replaceState keeps the browser back button pointing to the referring page rather than building a stack of focus states.",
-      "alternativesConsidered": [
-        "pushState — adds back-button navigation through focus history, useful but complex for v1"
-      ],
-      "date": "2026-03-21"
-    }
+    {"decision": "Focus mode dims non-focal cards in place rather than filtering the visible set","rationale": "Keeping all cards in the DOM preserves spatial layout and peripheral context — filtering collapsed the tree too aggressively and removed useful context.","alternativesConsidered": ["Filter visibleTree to focused + ancestors + children only — removed spatial context, felt like a mode switch"],"date": "2026-03-21"},
+    {"decision": "Breadcrumb trail as the primary 'hop up' affordance","rationale": "A breadcrumb renders the full ancestor path and lets readers click any ancestor to re-focus — one click to go up, or skip directly to root.","alternativesConsidered": ["Back button — only goes to last visited node, not tree parent","Up arrow button — doesn't show the full path"],"date": "2026-03-21"},
+    {"decision": "Focus state lives in URL (query param ?focus=feat-2026-014)","rationale": "Unlike collapse state, focus is a meaningful reading position worth sharing or bookmarking.","alternativesConsidered": ["Component state only — not shareable, resets on reload","localStorage — persists but not shareable"],"date": "2026-03-21"},
+    {"decision": "history.replaceState instead of pushState for URL sync","rationale": "Focus changes are navigation within the same view, not new history entries — replaceState keeps the back button pointing to the referring page.","alternativesConsidered": ["pushState — adds back-button focus history; useful but complex for v1"],"date": "2026-03-21"}
   ],
-  "implementation": "Focus mode is implemented as a URL query param (?focus=<featureKey>) read in App.tsx via URLSearchParams, synced back with history.replaceState on every change. When a focusKey is set, the visibleTree is NOT filtered — all non-collapsed cards remain in the DOM. Instead, a focusContextKeys Set is computed (ancestors walked via lineage.parent + direct children from childrenMap), and each card receives a focusState prop: 'focused' for the target card, 'context' for ancestors/children, 'dimmed' for everything else. CSS classes on the feature-entry wrapper handle the visual differentiation (see feat-2026-016). The breadcrumb component walks the ancestor chain from the focused feature to the root and renders a clickable path — each crumb calls setFocusKey. 'Hop up' is the second-to-last crumb. An '← all' button clears focusKey and restores normal mode.",
+  "implementation": "Focus mode is a URL query param (?focus=<featureKey>) read in App.tsx via URLSearchParams and synced back with history.replaceState. When focusKey is set, all non-collapsed cards remain in the DOM; a focusContextKeys Set (ancestors + direct children) drives per-card focusState prop: 'focused', 'context', or 'dimmed'. The breadcrumb walks the ancestor chain and each crumb calls setFocusKey. An '← all' button clears focusKey.",
   "knownLimitations": [
-    "URL-encoded focus requires the app to parse query params — currently the app has no router, so this needs a lightweight URL sync layer (e.g. URLSearchParams in useEffect)",
-    "Breadcrumb can get long for deeply nested features with verbose keys — no truncation strategy defined yet",
-    "Focus mode with ?focus= in URL could confuse visitors who land on a shared link without knowing the full tree exists",
-    "Collapse-all scoped to focused sub-tree requires tracking which features are in scope — adds complexity to the collapse state shape"
+    "Breadcrumb can get long for deeply nested features — no truncation strategy defined",
+    "Focus mode via ?focus= in URL may confuse visitors who land on a shared link",
+    "Collapse-all scoped to focused sub-tree adds complexity to the collapse state shape"
   ],
-  "successCriteria": "A reader can click 'focus' on any feature card, see only that feature + its ancestors + direct children, navigate up via breadcrumb, collapse all children with one click, and share the URL to give someone else the same focused view. Clearing focus restores the full tree.",
-  "tags": [
-    "navigation",
-    "focus",
-    "breadcrumb",
-    "ux",
-    "url-state"
-  ],
-  "lineage": {
-    "parent": "feat-2026-005",
-    "children": [
-      "feat-2026-016"
-    ],
-    "spawnReason": "Collapse/expand (feat-2026-005) handles dismissal; this feature handles intentional navigation — repositioning to the story that matters rather than hiding the stories that don't."
-  },
+  "successCriteria": "A reader can click 'focus' on any feature, see only that feature + ancestors + direct children, navigate up via breadcrumb, and share the URL to give someone else the same focused view.",
+  "tags": ["navigation","focus","breadcrumb","ux","url-state"],
+  "lineage": {"parent": "feat-2026-005","children": ["feat-2026-016"],"spawnReason": "Collapse/expand handles dismissal; this feature handles intentional navigation to the story that matters."},
   "domain": "ux",
   "priority": 1
 }

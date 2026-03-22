@@ -1,0 +1,104 @@
+{
+  "featureKey": "feat-2026-023",
+  "title": "MCP-Assisted Feature Authoring",
+  "status": "frozen",
+  "problem": "Writing feature.json files by hand is friction-heavy — when Claude has MCP tool access, it can read context, generate field values, and write them back, turning provenance capture into a side-effect of the conversation.",
+  "schemaVersion": 1,
+  "analysis": "The lac-mcp server exposes the LAC workspace as MCP tools that let Claude act as a provenance co-author — scanning existing features for context, generating analysis grounded in actual code, and persisting results to disk. This feature is itself a live demonstration: created entirely through MCP tool calls during a Claude Code session. It has since spawned three children (024, 025, 026) that document progressively deeper uses of the toolchain: full tool surface, a Windows bug fix, and a full freeze-and-commit session.",
+  "decisions": [
+    {
+      "decision": "Place the feature under src/mcp-authoring/ as a standalone directory",
+      "rationale": "The feature documents an AI-assisted authoring workflow, not a UI component or data slice — its own folder keeps it discoverable without coupling to an existing domain.",
+      "alternativesConsidered": [
+        "Nest under src/integration/ — different concern, the Vite glob pipeline",
+        "Nest under src/ecosystem/lac-mcp/ — that documents the package, not the workflow"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "Status set to active rather than frozen (original session)",
+      "rationale": "MCP-assisted authoring was evolving — fill_feature and generate_from_feature tools were not yet exercised in this showcase, so active signalled more to demonstrate.",
+      "alternativesConsidered": [
+        "frozen — premature; full tool surface hadn't been shown yet"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "Spawn three children rather than extending 023 with more trace entries",
+      "rationale": "Each child documents a distinct authoring scenario — full tool surface (024), Windows bug resolution (025), freeze session (026). Keeping them separate preserves addressability and lineage navigation.",
+      "alternativesConsidered": [
+        "Append traces to McpAuthoring.tsx inline — loses per-scenario addressability and makes the card unreadably long"
+      ],
+      "date": "2026-03-21"
+    }
+  ],
+  "implementation": "McpAuthoring.tsx renders the original 4-step tool call trace that created this feature. McpBugTrace.tsx (in bugs/tool-path-resolution) renders the trace for the 025 bug child. McpClaudeSession.tsx (in mcp-claude-session) renders the 12-step freeze session trace for child 026. The feature.json was created via mcp__lac__create_feature and patched via mcp__lac__write_feature_fields. Three child features now extend the story.",
+  "tags": [
+    "mcp",
+    "ai-assisted",
+    "authoring",
+    "lac",
+    "claude"
+  ],
+  "domain": "tooling",
+  "priority": 2,
+  "lineage": {
+    "parent": "feat-2026-001",
+    "spawnReason": "Demonstrates AI agents authoring provenance directly via MCP, closing the loop between AI-assisted development and decision capture.",
+    "children": [
+      "feat-2026-025",
+      "feat-2026-026"
+    ]
+  },
+  "successCriteria": "The feature.json exists on disk, was created entirely through MCP tool calls, renders correctly in the running app, and its implementation field accurately describes how it was produced.",
+  "knownLimitations": [
+    "featureKey not auto-incremented by create_feature — corrected manually via write_feature_fields",
+    "Tool call trace lives only in prose — no structured replay log exists"
+  ],
+  "statusHistory": [
+    {
+      "from": "active",
+      "to": "frozen",
+      "date": "2026-03-22"
+    },
+    {
+      "from": "frozen",
+      "to": "active",
+      "date": "2026-03-22",
+      "reason": "Scope expanded: add streaming support"
+    },
+    {
+      "from": "active",
+      "to": "frozen",
+      "date": "2026-03-22"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "reopen-1774146993936",
+      "author": "lac advance",
+      "date": "2026-03-22",
+      "type": "reopen",
+      "body": "Scope expanded: add streaming support"
+    },
+    {
+      "id": "stale-1774146993937",
+      "author": "lac advance",
+      "date": "2026-03-22",
+      "type": "stale-review",
+      "body": "Fields that may need updating after reopen: analysis, implementation, decisions"
+    }
+  ],
+  "revisions": [
+    {
+      "date": "2026-03-22",
+      "author": "claude-sonnet-4-6",
+      "fields_changed": [
+        "analysis",
+        "implementation",
+        "decisions"
+      ],
+      "reason": "Resolve stale fields after reopen — reflect three-child state (024, 025, 026) and current scope"
+    }
+  ]
+}

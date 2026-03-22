@@ -1,0 +1,72 @@
+{
+  "featureKey": "feat-2026-024",
+  "title": "The Loop Closes — MCP Full Tool Surface",
+  "status": "frozen",
+  "problem": "feat-2026-023 proved MCP tool calls could author a feature, but only four tools fired and the key misfired — this child demonstrates the complete AI-authored provenance loop with the full toolchain.",
+  "schemaVersion": 1,
+  "analysis": "feat-2026-023 was a proof of concept; this feature runs the same experiment with the updated lac-mcp that now exposes fill_feature, generate_from_feature, get_lineage, blame_file, and lint_workspace. The result is a fully automated provenance loop: Claude reads context, fills semantic fields, checks lineage, lints the workspace, and generates a display component — all without the developer touching a file.",
+  "decisions": [
+    {
+      "decision": "Use fill_feature instead of write_feature_fields for semantic content",
+      "rationale": "fill_feature reads surrounding source files and generates grounded field values in one call — write_feature_fields is a raw patch that just persists whatever Claude already has in context.",
+      "alternativesConsidered": [
+        "write_feature_fields with manually crafted content — what feat-2026-023 did, bypasses the read-then-generate loop",
+        "Leave fields empty and call fill_feature later — trace card would be incomplete on first render"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "Call get_lineage immediately after create_feature",
+      "rationale": "Confirms the parent-child link is live before any further writes — catches key collisions like the one in feat-2026-023 before they cascade.",
+      "alternativesConsidered": [
+        "Skip lineage check — blind to key conflicts until the app renders wrong"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "Call lint_workspace at the end of the session",
+      "rationale": "Validates the whole workspace, not just the new feature — catches drift in sibling features the session may have touched.",
+      "alternativesConsidered": [
+        "Lint only the new feature — faster but misses cross-feature regressions"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "generate_from_feature produces the trace component, not hand-authoring",
+      "rationale": "The whole point of this child is to close the loop — the component rendering the trace should itself be a generated artifact, not hand-written prose.",
+      "alternativesConsidered": [
+        "Hand-write the component like feat-2026-023 — self-defeating for a feature about AI generation"
+      ],
+      "date": "2026-03-21"
+    }
+  ],
+  "implementation": "McpChild.tsx renders the full 7-step tool call trace that produced this feature, with a 'NEW' badge on tools that didn't exist when feat-2026-023 was authored. Injected into the FeatureCard expanded section when featureKey === 'feat-2026-024'. The feature.json was scaffolded via create_feature, enriched via fill_feature, lineage-verified via get_lineage, workspace-validated via lint_workspace, and this component generated via generate_from_feature.",
+  "knownLimitations": [
+    "Counter misfire on create_feature is a known bug — .lac/counter was out of sync",
+    "generate_from_feature output requires minor post-processing for project-specific CSS class names",
+    "blame_file called but workspace has only one commit — output was minimal"
+  ],
+  "tags": [
+    "mcp",
+    "ai-assisted",
+    "authoring",
+    "lac",
+    "claude",
+    "full-loop",
+    "generation"
+  ],
+  "lineage": {
+    "parent": "feat-2026-023",
+    "spawnReason": "feat-2026-023 showed feature creation via MCP; this child shows filling, generating, linting, and lineage verification."
+  },
+  "successCriteria": "The feature.json was produced entirely through MCP tool calls, the trace card renders with all 7 steps annotated, NEW badges correctly flag tools unavailable during feat-2026-023, and lint_workspace passes.",
+  "domain": "tooling",
+  "priority": 2,
+  "statusHistory": [
+    {
+      "from": "active",
+      "to": "frozen",
+      "date": "2026-03-22"
+    }
+  ]
+}

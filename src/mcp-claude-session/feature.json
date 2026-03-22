@@ -1,0 +1,80 @@
+{
+  "featureKey": "feat-2026-026",
+  "title": "Claude + MCP — Freeze the Whole Ecosystem",
+  "status": "frozen",
+  "problem": "After three sessions adding features and demos, the workspace has active and draft features that haven't been frozen — this child documents the MCP tool calls Claude used in a single session to read context, resolve stale fields, advance every feature to frozen, and commit the whole ecosystem.",
+  "schemaVersion": 1,
+  "domain": "tooling",
+  "tags": [
+    "mcp",
+    "ai-assisted",
+    "authoring",
+    "lac",
+    "claude",
+    "freeze",
+    "lifecycle"
+  ],
+  "lineage": {
+    "parent": "feat-2026-023",
+    "spawnReason": "scope split: document the freeze-and-commit lifecycle session as a standalone traceable feature"
+  },
+  "analysis": "The workspace accumulated three active/draft features across multiple sessions — 023 (active, stale), 024 (active, no statusHistory), 025 (draft). This feature documents the MCP-guided session where Claude read context on each, resolved stale annotations, advanced 025 through draft→active→frozen, filled missing fields on 024, and froze 023 and 024 — all without opening a single file manually. The session also produced this feature itself, closing the authoring loop one level deeper.",
+  "decisions": [
+    {
+      "decision": "Resolve 023 stale fields before advancing any sibling features",
+      "rationale": "023 is the parent — its stale analysis and decisions would invalidate the lineage story if left unresolved while children freeze around it.",
+      "alternativesConsidered": [
+        "Freeze children first, then fix parent — parent would show stale annotations in the rendered card while children are already frozen"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "Advance 025 through active before freezing, not directly from draft",
+      "rationale": "The schema enforces draft→active→frozen; skipping active would violate the transition guard and confuse the statusHistory timeline.",
+      "alternativesConsidered": [
+        "Patch status directly in JSON — bypasses validation and loses the statusHistory entry"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "Document this session as feat-2026-026, a child of 023",
+      "rationale": "The session itself is a provenance artifact — spawning it as a child of 023 keeps the full MCP authoring story navigable via lineage, not just readable in a README.",
+      "alternativesConsidered": [
+        "Inline the session trace into 023's implementation — loses addressability and conflates two distinct sessions"
+      ],
+      "date": "2026-03-21"
+    }
+  ],
+  "implementation": "McpClaudeSession.tsx renders the 9-step tool call trace that produced this session: roadmap orientation, read_feature_context on each active/draft feature, write_feature_fields for stale resolution, advance_feature calls for each transition, and the spawn that created this feature. NEW badges mark tools used for the first time in this session. Injected into the FeatureCard expanded section when featureKey === 'feat-2026-026'.",
+  "successCriteria": "All four features (023, 024, 025, 026) reach frozen status in a single session, the workspace lint passes, this feature's trace card renders the full 9-step sequence with correct NEW badges, and the commit lands on GitHub triggering a Vercel redeploy.",
+  "knownLimitations": [
+    "Trace is authored from Claude's in-context memory of the session — not a machine-captured replay log",
+    "advance_feature for 025 required two calls (draft→active, then active→frozen) which adds ceremony for a bug fix with no code changes"
+  ],
+  "priority": 2,
+  "revisions": [
+    {
+      "date": "2026-03-22",
+      "author": "claude-sonnet-4-6",
+      "fields_changed": [
+        "analysis",
+        "decisions",
+        "implementation",
+        "successCriteria"
+      ],
+      "reason": "Initial field fill for feat-2026-026 — generated from session context"
+    }
+  ],
+  "statusHistory": [
+    {
+      "from": "draft",
+      "to": "active",
+      "date": "2026-03-22"
+    },
+    {
+      "from": "active",
+      "to": "frozen",
+      "date": "2026-03-22"
+    }
+  ]
+}

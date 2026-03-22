@@ -2,53 +2,23 @@
   "featureKey": "feat-2026-021",
   "title": "Obsidian-style Graph View",
   "status": "frozen",
-  "problem": "The tree view shows lineage as an indented list — useful for reading in order, but it hides the topology. Readers cannot see the full web of connections at a glance: which features are densely connected, which are isolated, which form clusters. A force-directed graph would let any visitor instantly grasp the shape of the decision space.",
-  "analysis": "D3 force simulation positions nodes by repulsion + spring forces along parent/child edges. Each node is a feature; edges are parent→child relationships. Clicking a node triggers the same focus mechanism as the tree view. The graph shares the app's existing featureKey/focus state so both views stay in sync. The warm archival palette maps status colours to node fills; node size encodes completeness_pct.",
+  "problem": "The tree view shows lineage as an indented list but hides the topology — readers cannot see which features are densely connected, isolated, or form clusters.",
+  "analysis": "D3 force simulation positions nodes by repulsion + spring forces along parent/child edges. The graph shares the app's existing focusKey/focus state so both views stay in sync. Node size encodes completeness_pct and status colours map to the warm archival palette.",
   "decisions": [
-    {
-      "decision": "Reuse the existing focusKey state rather than a separate graph-selection concept",
-      "rationale": "The app already has a working focus mechanism with URL sync and breadcrumb navigation. Sharing it between views means clicking a node in the graph and then switching to the tree view highlights the same feature — the views compose naturally.",
-      "alternativesConsidered": [
-        "Separate selectedKey for graph — would need its own URL param and breadcrumb integration, duplicating logic"
-      ],
-      "date": "2026-03-21"
-    },
-    {
-      "decision": "Dark warm background for the graph canvas (#1C1714)",
-      "rationale": "The Obsidian graph idiom reads best against a dark background. Using the --text colour (very dark warm brown) preserves the archival palette rather than reaching for a generic #0d1117.",
-      "alternativesConsidered": [
-        "Light cream background — nodes on cream washed out and edges were invisible",
-        "Pure black — works but breaks the warm aesthetic"
-      ],
-      "date": "2026-03-21"
-    },
-    {
-      "decision": "View toggle (tree / graph) in the section header, not a separate route",
-      "rationale": "The app has no router. A toggle button is the minimal change; adding routing would require restructuring the entire app for one mode switch.",
-      "date": "2026-03-21"
-    }
+    {"decision": "Reuse the existing focusKey state rather than a separate graph-selection concept","rationale": "The app already has a working focus mechanism with URL sync and breadcrumb — sharing it means clicking a graph node and switching to tree view highlights the same feature.","alternativesConsidered": ["Separate selectedKey for graph — would duplicate URL param and breadcrumb logic"],"date": "2026-03-21"},
+    {"decision": "Dark warm background for the graph canvas (#1C1714)","rationale": "The Obsidian graph idiom reads best on dark background — using the --text colour preserves the archival palette rather than reaching for a generic dark.","alternativesConsidered": ["Light cream background — nodes washed out and edges invisible","Pure black — breaks the warm aesthetic"],"date": "2026-03-21"},
+    {"decision": "View toggle (tree / graph) in the section header, not a separate route","rationale": "The app has no router — a toggle button is the minimal change; restructuring the app for one mode switch is not warranted.","date": "2026-03-21"}
   ],
-  "tags": [
-    "graph",
-    "d3",
-    "lineage",
-    "visualisation",
-    "obsidian",
-    "force-directed"
-  ],
-  "lineage": {
-    "parent": "feat-2026-005",
-    "spawnReason": "The tree view (feat-2026-005) established collapsible lineage threads; the next natural step is a spatial graph view so visitors can see the full topology at once rather than reading the tree linearly."
-  },
-  "implementation": "FeatureGraph.tsx uses d3 force simulation (forceLink + forceManyBody + forceCenter + forceCollide) rendered into an SVG. Nodes are coloured by status using CSS custom property values; node radius scales from 5–14px based on completeness_pct. Edges connect parent→child. Hover highlights the hovered node's edges and fades unrelated nodes. Clicking a node calls onNodeClick(featureKey) which sets the App's focusKey — the same handler used by the tree view's focus button. Pan and zoom are handled by d3-zoom on the SVG element.",
-  "successCriteria": "A 'Graph' toggle appears next to the feature list heading. Clicking it replaces the tree with a force-directed graph. Nodes are draggable. Hovering a node highlights its edges. Clicking a node focuses it (same breadcrumb behaviour as the tree). Clicking 'Tree' returns to the list.",
+  "tags": ["graph","d3","lineage","visualisation","obsidian","force-directed"],
+  "lineage": {"parent": "feat-2026-005","spawnReason": "The tree view established collapsible lineage threads; the graph shows full topology at a glance."},
+  "implementation": "FeatureGraph.tsx uses d3 force simulation (forceLink + forceManyBody + forceCenter + forceCollide) rendered into an SVG. Nodes are coloured by status via CSS custom property values; radius scales 5–14px based on completeness_pct. Clicking a node calls onNodeClick(featureKey) which sets the App's focusKey. Pan and zoom handled by d3-zoom on the SVG element.",
+  "successCriteria": "A 'Graph' toggle replaces the tree with a force-directed graph where nodes are draggable, hovering highlights edges, clicking a node focuses it, and 'Tree' returns to the list.",
   "domain": "ux",
   "schemaVersion": 1,
   "knownLimitations": [
-    "No ResizeObserver — graph dimensions are captured once at mount; resizing the browser window or toggling the sidebar won't reflow the simulation without a page reload",
-    "features.find() is called on every D3 mousemove/hover event — O(n) linear scan per frame; should be a pre-built Map<string, Feature> for performance at scale",
-    "completeness_pct is not a field on the Feature type, so all nodes default to 50 via ?? 50 — every node renders at the same radius regardless of actual documentation completeness",
-    "Node labels are only visible on hover (tooltip) — the graph has no always-visible text, so features aren't identifiable at a glance without mousing over each node individually"
+    "No ResizeObserver — graph doesn't reflow on window resize without page reload",
+    "features.find() is O(n) per D3 hover event — should be a pre-built Map for performance at scale",
+    "completeness_pct not on the Feature type — all nodes default to radius 50, same size regardless of completeness"
   ],
   "priority": 2
 }
