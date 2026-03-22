@@ -26,7 +26,7 @@ content are the same thing: the self-documenting loop is closed.
 
 ---
 
-## Run it
+## Run it locally
 
 ```bash
 bun install
@@ -39,6 +39,58 @@ Build a static bundle:
 bun run build
 bun run preview
 ```
+
+---
+
+## Deploy to Vercel
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/majeanson/lac-showcase)
+
+This repo ships with a `vercel.json` that configures the build automatically —
+no Vercel dashboard settings needed.
+
+### One-time setup
+
+1. Push this repo to GitHub (or GitLab / Bitbucket).
+
+2. Go to [vercel.com](https://vercel.com) → **Add New Project** → import the repo.
+
+3. Vercel will detect `vercel.json` and pre-fill:
+   - **Build command**: `bun run build`
+   - **Output directory**: `dist`
+   - **Install command**: `bun install`
+
+   Leave everything as-is and click **Deploy**.
+
+That's it. Vercel assigns a `*.vercel.app` URL on first deploy. Every push to
+`main` redeploys automatically.
+
+### Deploy via CLI
+
+```bash
+npm i -g vercel   # one-time
+vercel            # first deploy — follow the prompts
+vercel --prod     # promote to production URL
+```
+
+### What `vercel.json` contains
+
+```json
+{
+  "buildCommand": "bun run build",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "installCommand": "bun install"
+}
+```
+
+No environment variables required — the app is fully static. Feature data is
+embedded at build time via `import.meta.glob`.
+
+### Use your own domain
+
+In the Vercel dashboard → **Settings → Domains** → add your domain and follow
+the DNS instructions. No code changes needed.
 
 ---
 
