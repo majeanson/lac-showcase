@@ -1,0 +1,67 @@
+{
+  "featureKey": "feat-2026-003",
+  "title": "Visual Design System",
+  "status": "frozen",
+  "problem": "The app needs a cohesive visual language — typography, color, spacing — that feels like a well-crafted technical journal, not a generic dev tool. Without intentional design decisions documented, the aesthetic drifts as the project grows.",
+  "schemaVersion": 1,
+  "analysis": "Warm archival aesthetic — cream background (#F2EDE3), rust/terra cotta accent (#7C3217), dark brown text (#1C1714). Three font roles: Playfair Display (display headers), Lora (body prose), JetBrains Mono (keys, labels, badges). Status colors use muted naturals: forest green for active, amber for draft, navy for frozen. All tokens live in CSS custom properties on :root in index.css, making them trivially overridable.",
+  "decisions": [
+    {
+      "decision": "Warm archival palette over dark-mode dev aesthetic",
+      "rationale": "The content is about reasoning and decisions — it deserves a reading experience, not a code editor. Cream/rust reads like a well-designed technical journal.",
+      "alternativesConsidered": [
+        "Dark mode terminal aesthetic — too expected for a dev tool",
+        "Minimal white — sterile, forgettable"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "Playfair Display + Lora + JetBrains Mono type trio",
+      "rationale": "Playfair's editorial weight anchors titles. Lora gives body text warmth and readability. JetBrains Mono gives technical elements (keys, badges) precision without feeling cold.",
+      "alternativesConsidered": [
+        "Inter or system fonts — generic, no character",
+        "All-serif — loses the technical contrast"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "CSS custom properties for all design tokens",
+      "rationale": "Single source of truth. Any component can reference --accent or --font-display without importing a theme object. Easy to override per-section.",
+      "alternativesConsidered": [
+        "Tailwind config — adds a build dependency for what is essentially a small design system",
+        "Hardcoded values — brittle, doesn't scale"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "Tokens applied and frozen — all components verified against var() references",
+      "rationale": "Design system is complete for the current scope. index.css holds all :root tokens; App.css uses only var(--token) references with no hardcoded color values remaining except status-draft and status-deprecated border-left fallbacks.",
+      "alternativesConsidered": [],
+      "date": "2026-03-21"
+    }
+  ],
+  "lineage": {
+    "parent": "feat-2026-002",
+    "children": [
+      "feat-2026-005"
+    ],
+    "spawnReason": "The app shell needed a visual identity before UI components could be built consistently."
+  },
+  "tags": [
+    "design",
+    "typography",
+    "css",
+    "tokens",
+    "aesthetic"
+  ],
+  "implementation": "All tokens defined in src/index.css :root block. Font faces loaded via Google Fonts @import. Component styles in App.css use only var(--token) references. Status colors follow a consistent pattern: each status has a --status-{name} (text) and --status-{name}-bg (background) pair.",
+  "knownLimitations": [
+    "No dark mode support — the warm cream palette is hardcoded with no alternate theme defined",
+    "Google Fonts @import adds a network dependency; no fallback loading strategy for offline or slow connections (FOIT risk)",
+    "Design tokens are undocumented — no storybook or reference page exists to browse available tokens",
+    "Status color pairs (--status-{name} / --status-{name}-bg) are not enforced by any linting rule, so new statuses can be added inconsistently"
+  ],
+  "successCriteria": "All UI components reference design tokens via CSS custom properties rather than hardcoded values. Playfair Display, Lora, and JetBrains Mono load correctly and render in their intended roles. The warm archival aesthetic is visually consistent across the full app.",
+  "domain": "design-system",
+  "priority": 1
+}

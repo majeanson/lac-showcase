@@ -1,0 +1,57 @@
+{
+  "featureKey": "feat-2026-004",
+  "title": "What is Life-as-Code",
+  "status": "frozen",
+  "problem": "Visitors see a portfolio of features but have no context for what life-as-code is or why it matters. Without an explanation section, the workflow being showcased is invisible to anyone who hasn't heard of LAC before.",
+  "schemaVersion": 1,
+  "analysis": "A short explainer section rendered above the feature list. Explains the core LAC idea: software decisions get lost because they live in people's heads, Slack threads, and PRs that nobody reads later. LAC fixes this by treating provenance as a first-class artifact — a feature.json that lives next to the code it describes. The section uses the same design tokens as the rest of the app and links to the LAC CLI for visitors who want to adopt the workflow.",
+  "decisions": [
+    {
+      "decision": "Inline section in the single-page layout rather than a separate /about route",
+      "rationale": "The explainer is short enough that routing adds friction. Scrolling past it into the features is the natural reading flow.",
+      "alternativesConsidered": [
+        "Separate /about page — breaks the single-page reading experience",
+        "Modal or popover — hides content from visitors who just want to skim"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "About component imported into App.tsx above the feature list",
+      "rationale": "Wired directly between the header and the features-list — visitors read the explanation before encountering the features it describes.",
+      "alternativesConsidered": [
+        "Below the feature list — too late; visitors hit the cards before understanding what they are"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "about-section styled with accent left-border matching the design system",
+      "rationale": "Visually distinguishes the explainer from feature cards while staying within the same token vocabulary.",
+      "alternativesConsidered": [
+        "Plain prose, no border — loses the visual separation from the feature list"
+      ],
+      "date": "2026-03-21"
+    }
+  ],
+  "lineage": {
+    "parent": "feat-2026-001",
+    "children": [
+      "feat-2026-006"
+    ],
+    "spawnReason": "The root feature is the showcase itself — it needs to explain its own context to visitors who don’t already know what LAC is."
+  },
+  "tags": [
+    "about",
+    "explainer",
+    "lac",
+    "onboarding"
+  ],
+  "implementation": "About.tsx is a purely presentational React component with no props or data fetching. It renders as a <section> above the feature list using an about-label / about-body layout pattern that mirrors the card structure elsewhere in the app. All styles are applied via BEM-style class names that reference CSS custom properties from the design system (feat-2026-003), so typography and color stay consistent without any inline styles. Two external links — the LAC CLI GitHub repo and the VS Code extension marketplace listing — open in a new tab with rel=noreferrer. The component is imported directly into App.tsx and rendered once at the top of the page.",
+  "knownLimitations": [
+    "External links (GitHub, VS Code Marketplace) are hardcoded strings — any URL change requires a code edit",
+    "No i18n support; all copy is English-only and embedded in JSX",
+    "No visual focus indicator styling on .about-link beyond browser defaults — may not meet WCAG 2.4.7"
+  ],
+  "successCriteria": "The explainer section renders above the feature list on page load, uses the app's design tokens for consistent typography and color, and both external links open the correct destinations in a new tab.",
+  "domain": "content",
+  "priority": 2
+}

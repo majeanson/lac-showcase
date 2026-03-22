@@ -1,0 +1,63 @@
+{
+  "featureKey": "feat-2026-001",
+  "title": "Why I Built This",
+  "status": "frozen",
+  "problem": "Developers build things for reasons — but those reasons get lost. This app makes the reasoning visible: each project entry captures the problem being solved, the key decisions made, and what was learned. It's a personal portfolio that shows not just what was built, but why.",
+  "schemaVersion": 1,
+  "analysis": "A self-documenting portfolio app — the project captures its own reasoning as feature.json files, and the app renders them. The root feature.json describes the project itself; child features are spawned iteratively as the project grows. The data source is the repository itself, making the build process and the content inseparable. This creates a live demonstration of the life-as-code workflow: every decision made while building the app is also visible inside the app.",
+  "decisions": [
+    {
+      "decision": "React for the UI layer",
+      "rationale": "Component model maps naturally to feature cards. Easy to iterate on visuals without a full framework.",
+      "alternativesConsidered": [
+        "Plain HTML/CSS — less composable as features grow",
+        "Next.js — overkill for a static portfolio to start"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "feature.json files in the repo as the data source",
+      "rationale": "The project is self-describing. No CMS, no database — the provenance lives alongside the code that it documents.",
+      "alternativesConsidered": [
+        "Hardcoded entries — defeats the purpose",
+        "External CMS — separates content from context"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "Iterative feature spawning — root feature first, children added as the project grows",
+      "rationale": "Mirrors real-world software development. Each child feature is a new slice of work with its own problem, decisions, and context.",
+      "alternativesConsidered": [
+        "Plan all features upfront — premature, hides the iterative nature of the workflow"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "Root feature frozen once all designed features are implemented and visible in the running app",
+      "rationale": "The showcase is complete — 22 features spanning the full LAC ecosystem, all with analysis, decisions, implementation notes, known limitations, and success criteria visible in the app that documents them. The recursive loop is closed.",
+      "alternativesConsidered": [],
+      "date": "2026-03-21"
+    }
+  ],
+  "tags": [
+    "react",
+    "portfolio",
+    "life-as-code",
+    "self-documenting",
+    "provenance"
+  ],
+  "implementation": "The root feature.json at the project root acts as the entry point for the entire feature tree — it has no parent and no dedicated source file of its own. The Vite app (feat-2026-002) discovers it automatically via import.meta.glob alongside all child feature.json files. The self-documenting loop is the key pattern: every decision made while building the app is captured as a feature.json, and the app renders those same files. The root feature's decisions (React for UI, feature.json as data source, iterative spawning) are visible inside the running app, making the build process and the content inseparable.",
+  "knownLimitations": [
+    "No automated completeness check — features can be added with empty fields and the app renders them without warning"
+  ],
+  "successCriteria": "The app runs with `bun run dev`, renders the root feature card at depth 0 with its problem, decisions, and analysis visible, and all child features appear indented beneath it. The live app is the proof that the self-documenting workflow works.",
+  "domain": "portfolio",
+  "priority": 1,
+  "lineage": {
+    "children": [
+      "feat-2026-002",
+      "feat-2026-004",
+      "feat-2026-022"
+    ]
+  }
+}

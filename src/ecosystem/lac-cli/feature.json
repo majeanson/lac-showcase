@@ -1,0 +1,56 @@
+{
+  "featureKey": "feat-2026-007",
+  "title": "@majeanson/lac — The CLI",
+  "status": "frozen",
+  "problem": "Developers need a terminal-first way to create, search, validate, and manage feature.json files without leaving their workflow. Without a CLI, the only entry point to the LAC ecosystem is the editor or web app — both of which require more setup than a simple npm install.",
+  "schemaVersion": 1,
+  "analysis": "The public entry point to the LAC ecosystem. Ships as a single npm package (@majeanson/lac) but bundles three binaries: `lac` (the CLI), `lac-lsp` (language server), and `lac-mcp` (MCP server). 16+ commands cover the full lifecycle — init, create, search, blame, lineage, stat, lint, spawn, archive, diff, export, and serve. Built on Commander.js with Zod validation from feature-schema. All commands operate on the local filesystem — no server required.",
+  "implementation": "Entry point is src/index.ts, a Commander.js router that delegates to src/commands/*.ts. The filesystem walker (src/lib/walker.ts) and scanner (src/lib/scanner.ts) power all read commands by walking the repo for feature.json files. Config is loaded from .lac/config.json via src/lib/config.ts. The `lac fill` command delegates to lac-claude. Interactive commands use the `prompts` library for readline-based input. Static site export (lac export) generates self-contained HTML/CSS from src/templates/. Bundled with tsdown to ESM.",
+  "decisions": [
+    {
+      "decision": "Bundle all three binaries (CLI, LSP, MCP) into one npm package",
+      "rationale": "Simpler install story — one `npm install -g @majeanson/lac` gives the developer everything. No need to separately install server components.",
+      "alternativesConsidered": [
+        "Separate packages per binary — cleaner separation but friction-heavy install story for new users"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "Commander.js for CLI parsing",
+      "rationale": "Mature, well-documented, supports nested subcommands cleanly. The 16+ commands benefit from its structure.",
+      "alternativesConsidered": [
+        "Yargs — more config, less ergonomic for deep command trees",
+        "Bun.argv parsing — too low-level"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "File-system only, no database",
+      "rationale": "Features live in the repo alongside code. Git tracks history. No infra to provision or maintain.",
+      "alternativesConsidered": [
+        "SQLite sidecar — faster queries but severs the git-native workflow"
+      ],
+      "date": "2026-03-21"
+    }
+  ],
+  "knownLimitations": [
+    "Bundling all three binaries means users who only need the CLI always install the LSP and MCP server too",
+    "Interactive prompts require a real TTY — lac fill and lac init don't work in headless CI without --yes flags",
+    "No concurrent write safety — two processes running lac fill on the same feature.json simultaneously will produce conflicts",
+    "File-walking is repeated on every invocation with no caching layer"
+  ],
+  "successCriteria": "`npm install -g @majeanson/lac` succeeds and `lac init` creates a valid .lac/ workspace. All commands run without error on a repo containing valid feature.json files.",
+  "tags": [
+    "cli",
+    "npm",
+    "commander",
+    "bun",
+    "public"
+  ],
+  "lineage": {
+    "parent": "feat-2026-006",
+    "spawnReason": "The ecosystem overview needs a dedicated feature per package; the CLI is the primary user-facing entry point."
+  },
+  "domain": "cli",
+  "priority": 1
+}

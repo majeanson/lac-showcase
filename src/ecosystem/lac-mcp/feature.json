@@ -1,0 +1,48 @@
+{
+  "featureKey": "feat-2026-009",
+  "title": "lac-mcp — MCP Server",
+  "status": "frozen",
+  "problem": "AI assistants like Claude can help fill feature fields and generate code artifacts, but only if they have structured access to the workspace. Without an MCP server, Claude can only read files you manually paste into the conversation — it can't search features, create new ones, or write fields back to disk.",
+  "schemaVersion": 1,
+  "analysis": "An MCP (Model Context Protocol) server that exposes LAC as structured tools for Claude and any MCP-compatible AI client. Eight tools cover the full workflow: search, create, read context, write fields, fill with AI, generate artifacts, blame a file, get lineage, and lint the workspace. The read_feature_context + write_feature_fields pair implements a deliberate split: Claude reads context and generates values itself, then writes them back — keeping the AI in the loop without a second API call.",
+  "implementation": "Single file (src/index.ts, ~560 lines) that registers 8 MCP tools via the MCP SDK and communicates over stdio JSON-RPC. Each tool handler walks the filesystem for feature.json files, delegates to lac-claude for AI-heavy operations, and returns structured text results. fill_feature delegates to lac-claude's fillFeature(). generate_from_feature delegates to genFromFeature(). All writes use skipConfirm: true — no user approval step in MCP context. Bundled into the @majeanson/lac binary as the lac-mcp binary.",
+  "decisions": [
+    {
+      "decision": "read_feature_context + write_feature_fields as a two-step pattern instead of fill_feature",
+      "rationale": "When Claude Code is the client, Claude itself is the AI — there's no need to call the Anthropic API again. The split lets Claude read context, generate field values in its own response, and write them back. fill_feature exists for non-Claude MCP clients that need the AI call.",
+      "alternativesConsidered": [
+        "Single fill tool — can't leverage Claude-as-client without a redundant API call"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "skipConfirm: true for all MCP writes",
+      "rationale": "In an AI-assisted workflow, showing a confirmation prompt in the terminal would block the MCP client. AI tools are expected to be deterministic enough not to need per-write approval.",
+      "alternativesConsidered": [
+        "Interactive confirmation — breaks headless MCP workflow",
+        "Dry-run mode — useful addition but not yet implemented"
+      ],
+      "date": "2026-03-21"
+    }
+  ],
+  "knownLimitations": [
+    "No concurrency controls — simultaneous Claude sessions writing the same feature.json will conflict",
+    "All tools re-scan the entire workspace on every invocation (no shared index with lac-lsp)",
+    "skipConfirm means bad AI-generated values are written to disk without human review",
+    "No streaming — full response buffered before returning to MCP client"
+  ],
+  "successCriteria": "Claude Code with the MCP server configured can search, create, read, fill, and write feature.json files in a workspace without any manual file editing by the developer.",
+  "tags": [
+    "mcp",
+    "ai",
+    "claude",
+    "tools",
+    "protocol"
+  ],
+  "lineage": {
+    "parent": "feat-2026-006",
+    "spawnReason": "AI integration is a first-class surface of the LAC ecosystem — the MCP server is how Claude participates in the workflow."
+  },
+  "domain": "ai-integration",
+  "priority": 5
+}

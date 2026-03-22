@@ -1,0 +1,50 @@
+{
+  "featureKey": "feat-2026-022",
+  "title": "Life Decisions as Code",
+  "status": "frozen",
+  "problem": "Software decisions get captured in feature.json files — problem, rationale, alternatives considered. But the same reasoning gap exists in life: people make major personal decisions (career changes, relationships, where to live) with no record of why. The context evaporates. Years later, you can't reconstruct the logic. Life-as-Code applies the same provenance model to personal decisions.",
+  "schemaVersion": 1,
+  "lineage": {
+    "parent": "feat-2026-001",
+    "spawnReason": "The same provenance model applied to software decisions applies equally to major life decisions — career changes, relocation, relationships. Life-as-Code extends the practice beyond code.",
+    "children": [
+      "feat-2026-017",
+      "feat-2026-018"
+    ]
+  },
+  "analysis": "The feature.json model maps cleanly onto life decisions: every major choice has a problem it solves, alternatives that were seriously considered, and a rationale for the path taken. The difference is that life decisions feel too personal or too messy to document — but that's exactly when the context is most worth capturing. A career pivot, a relocation, a relationship choice: all have the same structure as a software architectural decision. This feature exists to make that parallel explicit and to show that LAC is not a developer tool — it's a reasoning tool.",
+  "decisions": [
+    {
+      "decision": "Spawn from the root feature rather than the ecosystem branch",
+      "rationale": "This is a conceptual extension of the core idea, not a package or UI feature. It belongs at the same level as the app shell and the about section — part of the why, not the how.",
+      "alternativesConsidered": [
+        "Spawn from feat-2026-004 (What is Life-as-Code) — too nested, loses visibility"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "Use real-sounding personal examples as children rather than hypotheticals",
+      "rationale": "Abstract examples don't land. A concrete career pivot or relocation decision makes the provenance model feel lived-in rather than academic.",
+      "alternativesConsidered": [
+        "Generic placeholder examples — too sterile to make the point"
+      ],
+      "date": "2026-03-21"
+    }
+  ],
+  "tags": [
+    "life-decisions",
+    "provenance",
+    "meta",
+    "personal",
+    "reasoning"
+  ],
+  "implementation": "No code — this is a content feature. feat-2026-017 and feat-2026-018 are the children that demonstrate the principle with concrete examples.",
+  "domain": "concept",
+  "priority": 4,
+  "knownLimitations": [
+    "The feature has no code artifact — the concept relies entirely on its children (feat-2026-017, feat-2026-018) to demonstrate it; without those rendered in the tree the feature reads as abstract",
+    "Whether the parallel between software and life decisions 'lands' for a reader is unobservable in the app — there is no measurable signal that the concept was understood",
+    "The model captures logic and rationale well but struggles with emotional and relational factors — a career pivot driven partly by burnout or a move driven partly by a relationship doesn't map cleanly to the decisions schema"
+  ],
+  "successCriteria": "A reader who is not a software developer looks at the career pivot and relocation child features and recognises the same reasoning structure they have used in their own major decisions. The parallel between a software architectural decision and a life decision is legible from the card alone — no explanation required."
+}

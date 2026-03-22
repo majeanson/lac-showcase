@@ -1,0 +1,52 @@
+{
+  "featureKey": "feat-2026-020",
+  "title": "Focus mode: children inherit focused state",
+  "status": "frozen",
+  "problem": "When a feature is focused in the feature list, its direct children appeared grey (55% opacity, 'context' state) instead of fully visible. This made it harder to read the child features that are directly part of the focused thread.",
+  "schemaVersion": 1,
+  "analysis": "In focus mode, the app assigns one of four states to each feature card: 'focused' (full opacity), 'context' (55% opacity), 'dimmed' (22% opacity), or 'normal'. Previously, ancestors got 'context' and direct children also got 'context' — both appeared grey. The focused feature's children are the most relevant items to read alongside it (they form the direct thread), so they should render at full opacity alongside the focused parent.",
+  "implementation": "Split focusContextKeys into two separate memos: focusAncestorKeys (ancestors only, keep at 'context') and focusChildKeys (direct children, promoted to 'focused'). Updated the focusState ternary so that node.featureKey === focusKey || focusChildKeys.has(node.featureKey) maps to 'focused', and only ancestors fall back to 'context'.",
+  "tags": [
+    "focus-mode",
+    "ux",
+    "feature-tree"
+  ],
+  "lineage": {
+    "parent": "feat-2026-016",
+    "spawnReason": "feat-2026-016 noted in knownLimitations that ancestors and direct children share the same 'context' opacity (0.55) and that a future refinement could distinguish them. This feature resolves it by promoting direct children to 'focused' state so they render at full opacity alongside the focused parent, while ancestors remain at 'context' opacity."
+  },
+  "decisions": [
+    {
+      "decision": "Split focusContextKeys into two separate memos — focusAncestorKeys and focusChildKeys — rather than a single combined set",
+      "rationale": "The existing memo pattern was already established; splitting it keeps the change minimal and co-located with the code that consumes each set. A single set with a type discriminant would have required restructuring the focusState ternary more invasively.",
+      "alternativesConsidered": [
+        "Single focusContextKeys with a { key, role } shape — more expressive but requires a Map instead of a Set, adding allocations on every render"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "Promote children to 'focused' state (same class as the clicked card) rather than a new intermediate state",
+      "rationale": "Reusing the existing 'focused' CSS class means no new styling is needed. Making children visually identical to the focused parent reinforces that they form a single readable unit — the thread — rather than a hierarchy of attention levels.",
+      "alternativesConsidered": [
+        "New 'child' CSS class at ~80% opacity — adds a fourth visual level; in practice indistinguishable from 'context' at a glance"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "Only direct children are promoted — grandchildren and deeper remain dimmed",
+      "rationale": "Promoting the full subtree would fill the viewport with full-opacity cards, defeating the focus mode's purpose. The focused 'thread' is parent + immediate children; deeper descendants require a separate focus click to explore.",
+      "alternativesConsidered": [
+        "Promote all descendants — too much noise; collapses the distinction between focused and context for deep trees"
+      ],
+      "date": "2026-03-21"
+    }
+  ],
+  "knownLimitations": [
+    "Only direct children are promoted — grandchildren at depth 2+ still render dimmed; reading a deep thread still requires multiple sequential focus clicks",
+    "A focused feature with many children (8+) fills the viewport with full-opacity cards, reducing the contrast between focused and context that makes focus mode useful",
+    "Ancestors appear at 55% opacity while children appear at 100% — this inverts reading-order intuition (ancestors feel more faded than children), which can be slightly disorienting on first encounter"
+  ],
+  "successCriteria": "When a feature is focused, its direct children render at full opacity alongside the focused card, while ancestors appear at 55% opacity and all other features dim to 22%. Reading the focused thread — parent card plus its direct children — requires no extra clicks and no hunting for the relevant cards.",
+  "domain": "ux",
+  "priority": 3
+}

@@ -1,0 +1,56 @@
+{
+  "featureKey": "feat-2026-018",
+  "title": "Moving Cities — Trading Stability for Optionality",
+  "status": "frozen",
+  "problem": "Deciding to move to a new city involves dozens of sub-decisions — neighbourhood, timing, what to keep, what to leave behind. Each one has a rationale that feels obvious at the time and opaque six months later. Without a record, the move just becomes \"I moved\" with no trace of the thinking behind it.",
+  "schemaVersion": 1,
+  "lineage": {
+    "parent": "feat-2026-022",
+    "spawnReason": "Relocating cities was the second major life decision tied to the career pivot — both were made together and deserve linked provenance records."
+  },
+  "analysis": "Moving cities is less like a single decision and more like a project: there's a top-level choice (go or stay) and then a cascade of sub-decisions that follow from it. The LAC parallel is exact — a root feature spawns children as the scope becomes clear. The relocation itself was the root: the neighbourhood, the lease length, the timing were the children. None were documented. The pattern is that life decisions have natural lineage too — they just aren't usually thought of that way.",
+  "decisions": [
+    {
+      "decision": "Optimise for optionality over stability at this stage",
+      "rationale": "Early-career, no dependents, low switching cost. The asymmetry favoured moving: upside was access to a denser network and more opportunities; downside was temporary discomfort.",
+      "alternativesConsidered": [
+        "Stay in current city — lower risk but compounding opportunity cost",
+        "Move abroad — too high a switching cost, language barrier for professional networking"
+      ],
+      "date": "2025-06-01"
+    },
+    {
+      "decision": "Short-term lease for the first 6 months",
+      "rationale": "Committing to a long lease before understanding the city's geography would have been premature optimisation. Short-term preserved the option to relocate within the city once the real constraints were visible.",
+      "alternativesConsidered": [
+        "12-month lease immediately — cheaper per month but locked in without local knowledge",
+        "Co-living / furnished rooms — too transient, hard to focus"
+      ],
+      "date": "2025-06-01"
+    },
+    {
+      "decision": "Move mid-year rather than January",
+      "rationale": "January moves happen at the same time as everyone else's — inflated prices, depleted inventory. Mid-year had better optionality in the rental market.",
+      "alternativesConsidered": [
+        "January — cleaner psychological reset but worse market conditions",
+        "Wait until year-end — too long, decision fatigue was already high"
+      ],
+      "date": "2025-06-01"
+    }
+  ],
+  "tags": [
+    "relocation",
+    "life-decision",
+    "optionality",
+    "provenance",
+    "personal"
+  ],
+  "implementation": "No code. The feature.json models the decision structure: one root choice (move) with sub-decisions (when, where, how long) that mirror the way software features spawn children as scope clarifies.",
+  "knownLimitations": [
+    "Sub-decisions (neighbourhood, lease terms) aren't spawned as separate child features here — that would be the full application of the model",
+    "Emotional and relational factors aren't easily captured in the decisions schema — the model handles logic better than feeling"
+  ],
+  "successCriteria": "A reader sees that the structure of a relocation decision is identical to the structure of a software architectural decision — and that documenting both is worth doing for the same reasons.",
+  "domain": "personal",
+  "priority": 2
+}

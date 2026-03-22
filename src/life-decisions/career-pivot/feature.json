@@ -1,0 +1,56 @@
+{
+  "featureKey": "feat-2026-017",
+  "title": "Career Pivot — Leaving Finance for Software",
+  "status": "frozen",
+  "problem": "I spent 4 years in finance before switching to software engineering. The decision took 18 months of deliberation but I never wrote any of it down. Now I can't reconstruct what tipped the balance, what alternatives I seriously considered, or what I was afraid of getting wrong. The reasoning is gone.",
+  "schemaVersion": 1,
+  "lineage": {
+    "parent": "feat-2026-022",
+    "spawnReason": "Leaving finance for software was the defining life decision that made the LAC project possible — it deserves its own provenance record."
+  },
+  "analysis": "Finance gave me precision and pattern recognition under uncertainty — both transfer directly to software engineering. The pivot wasn't impulsive: I spent 18 months building projects on weekends, talking to engineers, and stress-testing the hypothesis that I'd rather spend my time writing systems than analysing them. The decision had a clear problem, a clear set of alternatives, and a moment where the balance tipped. None of that exists anywhere. This feature.json is the first time I've written it down.",
+  "decisions": [
+    {
+      "decision": "Leave a stable role rather than transition internally",
+      "rationale": "Internal transitions in finance stay finance-adjacent. A clean break was the only way to fully context-switch and be taken seriously as an engineer.",
+      "alternativesConsidered": [
+        "Internal data/analytics role — still finance, just more technical",
+        "Part-time bootcamp while employed — not enough immersion to actually change trajectory"
+      ],
+      "date": "2024-09-01"
+    },
+    {
+      "decision": "Self-taught over bootcamp",
+      "rationale": "Bootcamps optimise for employment speed; I wanted to understand the fundamentals. The slower path built a stronger foundation and removed the 'bootcamp grad' ceiling.",
+      "alternativesConsidered": [
+        "Coding bootcamp — faster but shallower, expensive",
+        "CS degree — too long, didn't need the credential"
+      ],
+      "date": "2024-09-01"
+    },
+    {
+      "decision": "Target developer tooling as first domain",
+      "rationale": "Building tools for developers meant I could use my own products, get honest feedback from peers, and build in a space where quality of thinking is visibly rewarded.",
+      "alternativesConsidered": [
+        "Fintech — obvious fit but felt like staying in the same world",
+        "Frontend product work — too far from systems thinking"
+      ],
+      "date": "2025-01-15"
+    }
+  ],
+  "tags": [
+    "career",
+    "pivot",
+    "life-decision",
+    "provenance",
+    "personal"
+  ],
+  "implementation": "No code. The feature.json itself is the artifact — the first written record of a decision that was made and lived but never documented.",
+  "knownLimitations": [
+    "Written retrospectively — the rationale is reconstructed, not captured in the moment. Some of the original uncertainty is lost.",
+    "One person's experience; the pattern (document the pivot) generalises but the specifics don't"
+  ],
+  "successCriteria": "A reader who has made or is considering a major career change sees their own deliberation reflected in the structure — and considers writing it down.",
+  "domain": "personal",
+  "priority": 1
+}

@@ -1,0 +1,58 @@
+{
+  "featureKey": "feat-2026-012",
+  "title": "feature-schema — Canonical Schema",
+  "status": "frozen",
+  "problem": "Every package in the ecosystem reads and writes feature.json files. Without a shared schema package, each package would define its own types independently — leading to drift, inconsistent validation, and bugs when the shape of a feature changes.",
+  "schemaVersion": 1,
+  "analysis": "The shared foundation of the entire LAC ecosystem. Defines the Feature, Decision, Annotation, and Lineage types using Zod, exports TypeScript types via inference, provides runtime validation with human-readable error messages, and handles feature key generation with a persistent counter. Every other package depends on this one — it is the single source of truth for what a valid feature.json looks like.",
+  "implementation": "src/schema.ts defines Zod schemas for all types. src/types.ts re-exports inferred TypeScript types (type Feature = z.infer<typeof FeatureSchema>). src/validate.ts exports validateFeature() which returns typed errors. src/keygen.ts generates keys in the format <domain>-YYYY-NNN (e.g. feat-2026-007) by reading/writing a counter from .lac/counter and a deduplication set from .lac/keys. The package has multiple export entry points: ./ (main), ./schema, ./types, ./validate, ./keygen — allowing consumers to import only what they need.",
+  "decisions": [
+    {
+      "decision": "Zod for schema definition and runtime validation",
+      "rationale": "Single definition produces both the TypeScript type and the runtime validator. No code duplication, no drift between type and validator.",
+      "alternativesConsidered": [
+        "JSON Schema + ajv — verbose, no TypeScript inference",
+        "Hand-written types + manual validation — high maintenance burden as schema evolves"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "Feature key format: <domain>-YYYY-NNN",
+      "rationale": "Human-readable, sortable by year, and domain-prefixed so teams can use different prefixes (feat, proc, goal, adr) for different feature types.",
+      "alternativesConsidered": [
+        "UUID — opaque, not human-readable",
+        "Incrementing integer only — no year context, collides across years"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "Persist key counter in .lac/counter file",
+      "rationale": "Keys must be unique and monotonically increasing across all CLI invocations. A file is the simplest cross-process persistent counter that works without a database.",
+      "alternativesConsidered": [
+        "In-memory counter — resets between CLI calls, produces duplicate keys",
+        "Database counter — overkill, breaks local-first model"
+      ],
+      "date": "2026-03-21"
+    }
+  ],
+  "knownLimitations": [
+    "Key generation counter file is not atomic — concurrent CLI processes can generate duplicate keys",
+    "schemaVersion field exists in the schema but no migration path is implemented when the version increments",
+    "No encryption — feature.json files are plaintext on disk",
+    "Zod validation adds a small per-parse overhead that accumulates when validating hundreds of features at startup"
+  ],
+  "successCriteria": "All other packages import Feature types and validateFeature() from this package. A feature.json with missing required fields fails validation with a clear error. generateFeatureKey() produces unique, correctly formatted keys across sequential invocations.",
+  "tags": [
+    "schema",
+    "zod",
+    "types",
+    "validation",
+    "keygen"
+  ],
+  "lineage": {
+    "parent": "feat-2026-006",
+    "spawnReason": "The schema package is the lowest-level dependency in the ecosystem — understanding it is prerequisite to understanding every other package."
+  },
+  "domain": "schema",
+  "priority": 5
+}

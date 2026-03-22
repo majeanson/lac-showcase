@@ -1,0 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg:           #F2EDE3;
+  --bg-card:      #FAF7F2;
+  --text:         #1C1714;
+  --text-mid:     #4A3F36;
+  --text-soft:    #7A6E65;
+  --accent:       #7C3217;
+  --accent-warm:  #C4622E;
+  --border:       #D8CFBF;
+  --border-soft:  #EAE4D8;
+
+  --status-active:          #1A4A2E;
+  --status-active-bg:       #EBF5EF;
+  --status-draft:           #4A3B1A;
+  --status-draft-bg:        #F5EDD8;
+  --status-frozen:          #1A2E4A;
+  --status-frozen-bg:       #E8EFF5;
+  --status-deprecated:      #4A1A1A;
+  --status-deprecated-bg:   #F5E8E8;
+
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body:    'Lora', Georgia, serif;
+  --font-mono:    'JetBrains Mono', 'Courier New', monospace;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}

@@ -1,0 +1,58 @@
+{
+  "featureKey": "feat-2026-013",
+  "title": "lifeascode — Web App",
+  "status": "frozen",
+  "problem": "The CLI and editor extension are powerful for individual developers, but teams need a shared dashboard where anyone can browse features, view lineage, and explore the provenance of a codebase without installing anything locally. A web app makes LAC accessible to non-engineering stakeholders too.",
+  "schemaVersion": 1,
+  "analysis": "The web-based dashboard for the LAC ecosystem. A Next.js 16 app with Supabase as the database, tRPC for type-safe API calls, and Drizzle ORM for queries. Where the CLI operates on local files in git, the web app persists features to a database and makes them accessible to anyone on the team — including non-engineers. Deployed on Vercel. The monorepo contains dedicated packages for the API router, DB schema, shared UI components, auth, and validators.",
+  "implementation": "apps/nextjs/ is the Next.js App Router application. The tRPC router in packages/api/src/routers/ exposes procedures for features, search, admin, events, and GitHub integration. packages/db/ contains the Drizzle schema and migration files pointing at Supabase Postgres. packages/ui/ is a shared React component library (Tailwind + CVA + Base UI + Lucide). State is managed with Zustand (client) and TanStack Query (server). Next.js tag-based cache revalidation (revalidateTag) is used after mutations. Deployed via Vercel with config in vercel.json.",
+  "decisions": [
+    {
+      "decision": "tRPC for the API layer",
+      "rationale": "End-to-end type safety between the Next.js frontend and the API package. No separate OpenAPI spec or codegen step — types flow from the router definition to the React component.",
+      "alternativesConsidered": [
+        "REST + OpenAPI — more portable but requires codegen and loses type inference",
+        "GraphQL — more flexible but heavyweight for this use case"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "Supabase Postgres + Drizzle ORM",
+      "rationale": "Supabase provides a managed Postgres with realtime subscriptions and easy local dev. Drizzle gives type-safe queries without the overhead of Prisma.",
+      "alternativesConsidered": [
+        "SQLite (local-only) — no multi-user or team access",
+        "Prisma — heavier, slower cold starts on Vercel edge"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "Separate packages for api, db, ui, auth within the monorepo",
+      "rationale": "Clear separation of concerns — the API package can be tested independently of the Next.js app, the UI library can be reused across multiple apps.",
+      "alternativesConsimented": [
+        "Everything in apps/nextjs — faster to start but becomes unmaintainable"
+      ],
+      "date": "2026-03-21"
+    }
+  ],
+  "knownLimitations": [
+    "Features in the database and features in git can desync — the web app and CLI are two separate sources of truth",
+    "Requires Supabase credentials and Vercel deployment — significantly more infrastructure than the local CLI",
+    "No offline support — all queries hit Supabase over the network",
+    "tRPC tag-based cache revalidation must be manually maintained per mutation — easy to forget and serve stale data"
+  ],
+  "successCriteria": "The app deploys to Vercel, connects to Supabase, and displays all features with working search, lineage view, and feature detail pages. tRPC procedures return type-safe responses with no runtime type errors.",
+  "tags": [
+    "nextjs",
+    "supabase",
+    "trpc",
+    "drizzle",
+    "vercel",
+    "web"
+  ],
+  "lineage": {
+    "parent": "feat-2026-006",
+    "spawnReason": "The web app is the team-facing surface of the LAC ecosystem — where the CLI is for individual developers, this is for everyone else."
+  },
+  "domain": "web-app",
+  "priority": 2
+}

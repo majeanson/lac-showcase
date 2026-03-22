@@ -1,0 +1,64 @@
+{
+  "featureKey": "feat-2026-002",
+  "title": "React App Shell",
+  "status": "frozen",
+  "problem": "The portfolio needs a runnable React app that reads feature.json files from the project and renders them as a visual timeline. Without a working shell, no other features can be built or seen.",
+  "schemaVersion": 1,
+  "analysis": "Vite + React scaffold. Feature data is imported at build time via Vite's glob import (`import.meta.glob`), which walks the repo for all feature.json files and bundles them as static JSON. No server needed — the portfolio is a fully static site. The root feature.json and all child feature.json files become the dataset the UI renders.",
+  "decisions": [
+    {
+      "decision": "Vite over Create React App or Next.js",
+      "rationale": "Fast dev server, native glob imports for JSON, outputs a static site with no server runtime required.",
+      "alternativesConsidered": [
+        "Next.js — overkill, adds SSR complexity for static content",
+        "CRA — deprecated, slow"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "import.meta.glob to load feature.json files",
+      "rationale": "Vite natively resolves all matching files at build time into a single import map. No file system API needed at runtime — works in the browser.",
+      "alternativesConsidered": [
+        "Runtime fetch of JSON files — requires a server or known file list",
+        "Hardcoded imports — doesn't scale as features are added"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "Dead code removed (byKey, rooted variables in buildTree) during integration sprint",
+      "rationale": "The variables were computed but never read. Removing them during the integration sprint was zero-risk and resolved the known limitation documented at time of authoring.",
+      "alternativesConsidered": [],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "types.ts extended with successCriteria and domain to match feature.json schema",
+      "rationale": "Both fields were being written to feature.json files but were invisible to TypeScript. Adding them enables type-safe rendering in the card UI.",
+      "alternativesConsidered": [],
+      "date": "2026-03-21"
+    }
+  ],
+  "lineage": {
+    "parent": "feat-2026-001",
+    "children": [
+      "feat-2026-003",
+      "feat-2026-015"
+    ],
+    "spawnReason": "The root feature needs a runnable app before any UI work can begin."
+  },
+  "tags": [
+    "react",
+    "vite",
+    "scaffold",
+    "static-site"
+  ],
+  "implementation": "App.tsx renders a tree of FeatureNode components built by buildTree() in features.ts. features.ts uses import.meta.glob('../**/feature.json', { eager: true }) to collect all feature.json files in the project at build time — no server, no API. buildTree() sorts features into a depth-first tree using lineage.parent keys, then flattens to an ordered array with depth values for visual indentation. Each FeatureCard shows key, status badge, title, problem, tags, spawn reason, and an expandable section for analysis/decisions/limitations.",
+  "knownLimitations": [
+    "buildTree() computes `byKey` and `rooted` variables that are never read — dead code left from an earlier implementation",
+    "No error boundary around App or FeatureCard — a malformed feature.json (missing required fields) will crash the entire page with no recovery UI",
+    "The glob pattern `../**/feature.json` has no exclusions, so node_modules or test fixture feature.json files would be silently included in the dataset if they existed",
+    "No empty-state UI — if zero feature.json files are found, the app renders a blank features-list with no message"
+  ],
+  "successCriteria": "`bun run build` completes without TypeScript or Vite errors, and the app renders all feature.json files in the project as an indented tree of feature cards with correct depth, status badges, and expandable detail sections.",
+  "domain": "frontend",
+  "priority": 1
+}
