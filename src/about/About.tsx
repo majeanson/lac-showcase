@@ -17,8 +17,8 @@ const ecosystem = [
     key: 'lac-mcp',
     label: 'MCP server',
     desc: 'Exposes your feature workspace to Claude Desktop, Cursor, and any MCP-compatible AI host.',
-    href: null,
-    linkLabel: null,
+    href: 'https://github.com/majeanson/lac/tree/main/packages/lac-mcp',
+    linkLabel: 'GitHub →',
   },
   {
     key: 'lifeascode',
@@ -31,15 +31,15 @@ const ecosystem = [
     key: 'feature-schema',
     label: 'Canonical schema',
     desc: 'Single Zod source of truth shared across CLI, LSP, MCP, and web app.',
-    href: null,
-    linkLabel: null,
+    href: 'https://github.com/majeanson/lac/tree/main/packages/feature-schema',
+    linkLabel: 'GitHub →',
   },
   {
     key: 'lac-lsp',
     label: 'Language server',
     desc: 'Real-time validation of .lac/ YAML files against the schema in any LSP-compatible editor.',
-    href: null,
-    linkLabel: null,
+    href: 'https://github.com/majeanson/lac/tree/main/packages/lac-lsp',
+    linkLabel: 'GitHub →',
   },
 ]
 
@@ -62,9 +62,26 @@ export default function About() {
         </p>
 
         <p>
-          This portfolio is built with it. Every card below is a real{' '}
+          This showcase is built with it. Every card below is a real{' '}
           <code>feature.json</code> file in this repo — the app reads itself.
         </p>
+
+        <p>
+          Life-as-code ships as a set of tools that wire this workflow into your
+          editor, AI host, and CI — so the provenance stays with the code, always.
+        </p>
+
+        <div className="about-cta">
+          <code className="about-cta-cmd">npx @majeanson/lac init</code>
+          <a
+            href="https://github.com/majeanson/lac"
+            target="_blank"
+            rel="noreferrer"
+            className="about-link about-link--cta"
+          >
+            view on GitHub →
+          </a>
+        </div>
       </div>
 
       <div className="about-ecosystem">

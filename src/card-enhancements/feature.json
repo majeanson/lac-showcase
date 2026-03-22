@@ -1,0 +1,123 @@
+{
+  "featureKey": "feat-2026-029",
+  "title": "Card Enhancements — Completeness Badge, Priority Badge, Counts, Spawn Chain, Decision Dates",
+  "status": "frozen",
+  "problem": "Feature cards show title, problem, tags, and actions but give no at-a-glance signal of how well-documented a feature is, what its priority is, how many decisions/limitations it has, or how it relates to its parent via spawnReason. Decision dates are stored but not displayed.",
+  "schemaVersion": 1,
+  "domain": "ux",
+  "tags": [
+    "card",
+    "ux",
+    "completeness",
+    "badges",
+    "tags",
+    "breadcrumb",
+    "spawn-chain"
+  ],
+  "lineage": {
+    "parent": "feat-2026-015",
+    "spawnReason": "scope split: add completeness badge (0–100% from completenessOf), priority badge (P1–P5), decision/limitation count pills, clickable tags that activate filters, jump-to-graph button, decision dates in expanded view, spawn-chain strip in breadcrumb, stats bar above tree, deprecated card styling, and successCriteria moved to top of expanded content"
+  },
+  "analysis": "Each feature card was showing only the essentials (title, problem, tags, actions) but leaving several rich fields invisible or poorly surfaced. Eight enhancements were bundled: (1) Completeness badge — completenessOf(f) scores 7 optional fields (analysis, implementation, decisions, successCriteria, knownLimitations, tags, domain) and shows a colour-coded percentage (green ≥80%, amber ≥50%, red <50%). (2) Priority badge — renders P1–P5 when the priority field is set. (3) Decision/limitation count pills — shows '3 decisions' and '2 limitations' as muted badges at a glance without expanding. (4) Clickable tags — each tag chip is now a <button> that calls onTagClick, toggling the corresponding tag filter in FilterBar; active tags are highlighted. (5) Jump-to-graph button — '◎ graph' in the card action row sets focusKey and switches view to 'graph'. (6) Decision dates — decision.date is rendered inline with each decision title in the expanded section. (7) Inline spawnReason on cards — every card with a lineage.spawnReason shows a '↳ reason' line directly below the problem text, surfacing the spawn context without requiring focus mode. (8) Spawn chain in breadcrumb — when the focused feature chain contains features with spawnReason, a strip below the breadcrumb shows each parent→child reason as a readable sentence. Additionally: stats bar above the tree shows total features, decisions, and domains as live counts; deprecated features get an 'is-deprecated' CSS class for distinct styling; successCriteria section moved from bottom to top of expanded content.",
+  "implementation": "completenessOf(f: Feature): number exported from features.ts — checks 7 boolean conditions and returns Math.round(score * 100). FeatureCard renders a .completeness-badge with tier class (high/mid/low) computed inline via IIFE. Priority badge rendered as .priority-badge when node.priority != null. Count pills in .card-counts div rendered only when decisions or knownLimitations are non-empty. Tags converted from <span> to <button className='tag tag--clickable'> with onClick={() => onTagClick(t)} and tag--active class when activeTags.has(t). onTagClick and activeTags passed as props from App. Inline spawnReason: every FeatureCard renders <p className='spawn-reason'>↳ {node.lineage.spawnReason}</p> when the field is present, positioned below the problem text. Jump-to-graph button in card footer calls onJumpToGraph which sets focusKey + setView('graph'). Decision dates rendered as <span className='decision-date'>{d.date}</span> adjacent to decision title in expanded section. Breadcrumb component accepts focusFeature prop; chainSteps array built from ancestors.slice(1) + focusFeature; spawn-chain strip rendered as .spawn-chain div with .spawn-chain-step rows only when any step has lineage.spawnReason. Stats bar is a .stats-bar div above the feature list showing live counts from globalStats useMemo (updates when filter is active to show filtered count). Deprecated check added to feature-entry class list. Card footer action row has up to 5 buttons: '+ more context' (when expandable), '+ show children' (when has children), '⊙ focus', '{ json }', and '◎ graph'.",
+  "decisions": [
+    {
+      "decision": "completenessOf exported from features.ts and used in both FeatureCard and FeatureGraph",
+      "rationale": "A single computation ensures card badge and graph node size always agree — no risk of divergence between the two surfaces.",
+      "alternativesConsidered": [
+        "Inline computation per surface — risk of divergence",
+        "Store as computed field in feature.json — stale if schema changes"
+      ],
+      "date": "2026-03-22"
+    },
+    {
+      "decision": "Tags become filter-activating buttons, not decorative spans",
+      "rationale": "Tags are the primary facet for navigating related features — making them clickable collapses the gap between 'I see a tag I want' and 'I filter by that tag' from multiple steps to one click.",
+      "alternativesConsidered": [
+        "Keep as spans, filter only from FilterBar — friction",
+        "Open a modal on tag click — over-engineered for a filter action"
+      ],
+      "date": "2026-03-22"
+    },
+    {
+      "decision": "Spawn chain rendered as a strip below the breadcrumb, not inline in card body",
+      "rationale": "The spawn chain describes the reasoning thread between features — placing it under the breadcrumb keeps it in the navigation layer, not the card content layer, which is the right semantic position.",
+      "alternativesConsidered": [
+        "Inside the focused card body — buries it in content",
+        "Tooltip on breadcrumb crumbs — too small and hover-only"
+      ],
+      "date": "2026-03-22"
+    },
+    {
+      "decision": "successCriteria moved to top of expanded content",
+      "rationale": "successCriteria is the 'definition of done' — it's the most important summary for a reader who expands a card. It should appear before implementation prose.",
+      "alternativesConsidered": [
+        "Keep at bottom — last thing read, often missed",
+        "Show in card header always — too verbose for collapsed state"
+      ],
+      "date": "2026-03-22"
+    }
+  ],
+  "successCriteria": "Every card shows a colour-coded completeness percentage and (when set) a priority badge in the header. Clicking any tag chip activates that filter in FilterBar and highlights the tag on the card. The expanded card shows successCriteria first, then analysis, then decisions with dates, then limitations. A '◎ graph' button jumps to graph view focused on that node. The breadcrumb strip shows spawnReason sentences for each ancestor step when they exist. The stats bar above the list shows live feature/decision/domain counts.",
+  "knownLimitations": [
+    "Completeness score weights all 7 fields equally — a feature with one-line analysis scores the same as one with paragraphs",
+    "Jump-to-graph from a card doesn't animate the graph to the node immediately if the simulation is still settling",
+    "Spawn chain only shows steps that have a spawnReason — multi-hop chains with missing spawnReason silently skip those steps",
+    "Mobile action row can have up to 5 buttons (expand, show children, focus, json, graph) with no responsive collapse strategy"
+  ],
+  "priority": 2,
+  "revisions": [
+    {
+      "date": "2026-03-22",
+      "author": "claude",
+      "fields_changed": [
+        "analysis",
+        "implementation",
+        "decisions",
+        "successCriteria"
+      ],
+      "reason": "Initial field population — all enhancements implemented in App.tsx and features.ts; fields authored from code inspection"
+    },
+    {
+      "date": "2026-03-22",
+      "author": "claude",
+      "fields_changed": [
+        "analysis",
+        "implementation"
+      ],
+      "reason": "Fixed two inaccuracies: added missing inline spawnReason display on cards (p.spawn-reason, separate from breadcrumb spawn chain); corrected button count in knownLimitations from 3 to 5 (expand, show children, focus, json, graph). Analysis updated from 7 to 8 enhancements to include inline spawnReason."
+    }
+  ],
+  "statusHistory": [
+    {
+      "from": "draft",
+      "to": "active",
+      "date": "2026-03-22"
+    },
+    {
+      "from": "active",
+      "to": "frozen",
+      "date": "2026-03-22"
+    },
+    {
+      "from": "frozen",
+      "to": "active",
+      "date": "2026-03-22",
+      "reason": "Two inaccuracies: inline spawnReason display on every card body (p.spawn-reason ↳ text) is not mentioned — only the breadcrumb spawn chain is documented; knownLimitations says 'three buttons' in action row but there are five (expand, show children, focus, json, graph)."
+    },
+    {
+      "from": "active",
+      "to": "frozen",
+      "date": "2026-03-22"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "reopen-1774192366163",
+      "author": "lac advance",
+      "date": "2026-03-22",
+      "type": "reopen",
+      "body": "Two inaccuracies: inline spawnReason display on every card body (p.spawn-reason ↳ text) is not mentioned — only the breadcrumb spawn chain is documented; knownLimitations says 'three buttons' in action row but there are five (expand, show children, focus, json, graph)."
+    }
+  ]
+}

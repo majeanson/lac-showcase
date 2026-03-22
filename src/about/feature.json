@@ -4,21 +4,89 @@
   "status": "frozen",
   "problem": "Visitors see a portfolio of features but have no context for what life-as-code is or why it matters.",
   "schemaVersion": 1,
-  "analysis": "A short explainer section rendered above the feature list, explaining that LAC treats provenance as a first-class artifact — a feature.json living next to the code it describes. Links to the LAC CLI for visitors who want to adopt the workflow.",
+  "analysis": "A short explainer section rendered above the feature list that explains what life-as-code is, why provenance matters, and how to get started. The section has three parts: an intro/body block with prose paragraphs and a CTA; an ecosystem grid showing all six tools in the LAC toolchain. The CTA block provides an `npx @majeanson/lac init` command and a 'view on GitHub →' link so visitors can immediately try the workflow.",
   "decisions": [
-    {"decision": "Inline section in the single-page layout rather than a separate /about route","rationale": "The explainer is short enough that routing adds friction — scrolling into the features is the natural reading flow.","alternativesConsidered": ["Separate /about page — breaks single-page reading","Modal or popover — hides content from skimmers"],"date": "2026-03-21"},
-    {"decision": "About component imported into App.tsx above the feature list","rationale": "Visitors read the explanation before encountering the features it describes.","alternativesConsidered": ["Below the feature list — too late; visitors hit cards before understanding them"],"date": "2026-03-21"},
-    {"decision": "about-section styled with accent left-border matching the design system","rationale": "Visually distinguishes the explainer from feature cards while staying within the same token vocabulary.","alternativesConsidered": ["Plain prose, no border — loses visual separation from feature list"],"date": "2026-03-21"}
+    {
+      "decision": "Inline section in the single-page layout rather than a separate /about route",
+      "rationale": "The explainer is short enough that routing adds friction — scrolling into the features is the natural reading flow.",
+      "alternativesConsidered": [
+        "Separate /about page — breaks single-page reading",
+        "Modal or popover — hides content from skimmers"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "About component imported into App.tsx above the feature list",
+      "rationale": "Visitors read the explanation before encountering the features it describes.",
+      "alternativesConsidered": [
+        "Below the feature list — too late; visitors hit cards before understanding them"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "about-section styled with accent left-border matching the design system",
+      "rationale": "Visually distinguishes the explainer from feature cards while staying within the same token vocabulary.",
+      "alternativesConsidered": [
+        "Plain prose, no border — loses visual separation from feature list"
+      ],
+      "date": "2026-03-21"
+    }
   ],
-  "lineage": {"parent": "feat-2026-001","children": ["feat-2026-006"],"spawnReason": "The root feature needs to explain its own context to visitors who don't know what LAC is."},
-  "tags": ["about","explainer","lac","onboarding"],
-  "implementation": "About.tsx is a purely presentational React component with no props or data fetching, rendered as a <section> above the feature list using about-label/about-body layout. All styles use BEM-style class names referencing CSS custom properties from feat-2026-003. Two external links open in a new tab with rel=noreferrer.",
+  "lineage": {
+    "parent": "feat-2026-001",
+    "children": [
+      "feat-2026-006"
+    ],
+    "spawnReason": "The root feature needs to explain its own context to visitors who don't know what LAC is."
+  },
+  "tags": [
+    "about",
+    "explainer",
+    "lac",
+    "onboarding"
+  ],
+  "implementation": "About.tsx is a purely presentational React component with no props or data fetching, rendered as a <section> above the feature list using about-label/about-body layout. The body block contains four paragraphs (lead, what LAC is, the showcase self-reference, toolchain description) followed by an about-cta div with a styled <code> command and an <a> link to GitHub. The ecosystem grid maps a hardcoded array of six items — @majeanson/lac (npm), lac-lens (VS Code Marketplace), lac-mcp (GitHub), lifeascode (live demo), feature-schema (GitHub), lac-lsp (GitHub) — into ecosystem-card elements, each with a description and a working external link. All links use target='_blank' rel='noreferrer'. All styles reference CSS custom properties from feat-2026-003.",
   "knownLimitations": [
-    "External links are hardcoded — URL changes require a code edit",
+    "All URLs are hardcoded in the ecosystem array — any href change requires a code edit",
     "No i18n support — all copy is English-only JSX",
-    "No custom focus indicator on .about-link beyond browser defaults"
+    "No custom focus indicator on .about-link beyond browser defaults",
+    "Ecosystem item descriptions are not driven by feature.json — if a tool's scope changes, the About card won't update automatically"
   ],
-  "successCriteria": "The explainer section renders above the feature list on page load, uses the app's design tokens, and both external links open the correct destinations in a new tab.",
+  "successCriteria": "The explainer section renders above the feature list on page load, uses the app's design tokens, shows the npx init command in a code block, and all eight external links (6 ecosystem + GitHub CTA + npm CLI) open the correct destinations in a new tab.",
   "domain": "content",
-  "priority": 2
+  "priority": 2,
+  "statusHistory": [
+    {
+      "from": "frozen",
+      "to": "active",
+      "date": "2026-03-22",
+      "reason": "About.tsx significantly expanded: added npx CTA block, GitHub link, new toolchain paragraph, and all 6 ecosystem items now have working hrefs (lac-mcp, feature-schema, lac-lsp were previously null). Implementation and successCriteria describe 2 links; there are now 8+."
+    },
+    {
+      "from": "active",
+      "to": "frozen",
+      "date": "2026-03-22"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "reopen-1774192360598",
+      "author": "lac advance",
+      "date": "2026-03-22",
+      "type": "reopen",
+      "body": "About.tsx significantly expanded: added npx CTA block, GitHub link, new toolchain paragraph, and all 6 ecosystem items now have working hrefs (lac-mcp, feature-schema, lac-lsp were previously null). Implementation and successCriteria describe 2 links; there are now 8+."
+    }
+  ],
+  "revisions": [
+    {
+      "date": "2026-03-22",
+      "author": "claude",
+      "fields_changed": [
+        "analysis",
+        "implementation",
+        "successCriteria"
+      ],
+      "reason": "About.tsx expanded with CTA block (npx command + GitHub link), new toolchain paragraph, and all 6 ecosystem items now have working hrefs. Updated analysis, implementation, successCriteria, and knownLimitations to reflect actual code."
+    }
+  ]
 }

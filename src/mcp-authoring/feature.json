@@ -46,6 +46,7 @@
     "parent": "feat-2026-001",
     "spawnReason": "Demonstrates AI agents authoring provenance directly via MCP, closing the loop between AI-assisted development and decision capture.",
     "children": [
+      "feat-2026-024",
       "feat-2026-025",
       "feat-2026-026"
     ]
@@ -53,7 +54,8 @@
   "successCriteria": "The feature.json exists on disk, was created entirely through MCP tool calls, renders correctly in the running app, and its implementation field accurately describes how it was produced.",
   "knownLimitations": [
     "featureKey not auto-incremented by create_feature — corrected manually via write_feature_fields",
-    "Tool call trace lives only in prose — no structured replay log exists"
+    "Tool call trace lives only in prose — no structured replay log exists",
+    "Reopened with reason 'add streaming support' — this scope change was never implemented; the stale fields were resolved by updating the three-child state but streaming support does not exist in this codebase"
   ],
   "statusHistory": [
     {
@@ -80,13 +82,6 @@
       "date": "2026-03-22",
       "type": "reopen",
       "body": "Scope expanded: add streaming support"
-    },
-    {
-      "id": "stale-1774146993937",
-      "author": "lac advance",
-      "date": "2026-03-22",
-      "type": "stale-review",
-      "body": "Fields that may need updating after reopen: analysis, implementation, decisions"
     }
   ],
   "revisions": [

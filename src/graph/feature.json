@@ -3,22 +3,93 @@
   "title": "Obsidian-style Graph View",
   "status": "frozen",
   "problem": "The tree view shows lineage as an indented list but hides the topology — readers cannot see which features are densely connected, isolated, or form clusters.",
-  "analysis": "D3 force simulation positions nodes by repulsion + spring forces along parent/child edges. The graph shares the app's existing focusKey/focus state so both views stay in sync. Node size encodes completeness_pct and status colours map to the warm archival palette.",
+  "analysis": "D3 force simulation positions nodes by repulsion + spring forces along parent/child edges. The graph shares the app's existing focusKey/focus state so both views stay in sync. Node size (5–14px) encodes completeness_pct. Two colour modes driven by a colorBy prop: 'status' maps to warm palette constants (STATUS_NODE_COLOR/STATUS_GLOW); 'domain' maps 14 known domains to evenly-spaced HSL hues and adds forceX/Y cluster forces that pull nodes toward pre-computed domain centres on a circle at 28% of canvas radius, with SVG cluster labels. Hover shows a floating tooltip; click pins a full info panel (featureKey, title, status, domain, problem text). Ctrl+click calls onNodeJump to switch to tree view. Clicking also centres the graph on the node via an animated D3 zoom/pan transition. The graph receives filteredFeatures from App so filter state is honoured in graph view.",
   "decisions": [
-    {"decision": "Reuse the existing focusKey state rather than a separate graph-selection concept","rationale": "The app already has a working focus mechanism with URL sync and breadcrumb — sharing it means clicking a graph node and switching to tree view highlights the same feature.","alternativesConsidered": ["Separate selectedKey for graph — would duplicate URL param and breadcrumb logic"],"date": "2026-03-21"},
-    {"decision": "Dark warm background for the graph canvas (#1C1714)","rationale": "The Obsidian graph idiom reads best on dark background — using the --text colour preserves the archival palette rather than reaching for a generic dark.","alternativesConsidered": ["Light cream background — nodes washed out and edges invisible","Pure black — breaks the warm aesthetic"],"date": "2026-03-21"},
-    {"decision": "View toggle (tree / graph) in the section header, not a separate route","rationale": "The app has no router — a toggle button is the minimal change; restructuring the app for one mode switch is not warranted.","date": "2026-03-21"}
+    {
+      "decision": "Reuse the existing focusKey state rather than a separate graph-selection concept",
+      "rationale": "The app already has a working focus mechanism with URL sync and breadcrumb — sharing it means clicking a graph node and switching to tree view highlights the same feature.",
+      "alternativesConsidered": [
+        "Separate selectedKey for graph — would duplicate URL param and breadcrumb logic"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "Dark warm background for the graph canvas (#1C1714)",
+      "rationale": "The Obsidian graph idiom reads best on dark background — using the --text colour preserves the archival palette rather than reaching for a generic dark.",
+      "alternativesConsidered": [
+        "Light cream background — nodes washed out and edges invisible",
+        "Pure black — breaks the warm aesthetic"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "View toggle (tree / graph) in the section header, not a separate route",
+      "rationale": "The app has no router — a toggle button is the minimal change; restructuring the app for one mode switch is not warranted.",
+      "date": "2026-03-21"
+    }
   ],
-  "tags": ["graph","d3","lineage","visualisation","obsidian","force-directed"],
-  "lineage": {"parent": "feat-2026-005","spawnReason": "The tree view established collapsible lineage threads; the graph shows full topology at a glance."},
-  "implementation": "FeatureGraph.tsx uses d3 force simulation (forceLink + forceManyBody + forceCenter + forceCollide) rendered into an SVG. Nodes are coloured by status via CSS custom property values; radius scales 5–14px based on completeness_pct. Clicking a node calls onNodeClick(featureKey) which sets the App's focusKey. Pan and zoom handled by d3-zoom on the SVG element.",
-  "successCriteria": "A 'Graph' toggle replaces the tree with a force-directed graph where nodes are draggable, hovering highlights edges, clicking a node focuses it, and 'Tree' returns to the list.",
+  "tags": [
+    "graph",
+    "d3",
+    "lineage",
+    "visualisation",
+    "obsidian",
+    "force-directed"
+  ],
+  "lineage": {
+    "parent": "feat-2026-005",
+    "spawnReason": "The tree view established collapsible lineage threads; the graph shows full topology at a glance."
+  },
+  "implementation": "FeatureGraph.tsx uses D3 force simulation (forceLink + forceManyBody + forceCenter + forceCollide) rendered into an SVG. Nodes sized 5–14px by completenessOf(f) — computed at render time from optional-field coverage (analysis, implementation, decisions, successCriteria, knownLimitations, tags, domain). colorBy prop ('status' | 'domain') drives node colour and legend: status mode uses warm palette constants (STATUS_NODE_COLOR / STATUS_GLOW); domain mode maps 14 known domains to evenly-spaced HSL hues via domainColor/domainGlow helpers. When colorBy=domain, cluster forces (forceX/Y strength=0.18) pull nodes toward pre-computed domain centre positions arranged on a circle at 28% of canvas radius; cluster labels render in a dedicated SVG layer. Hover shows a floating tooltip; click pins a full info panel showing featureKey, title, status, domain, and problem text — click the × or click background to dismiss. Ctrl+click calls onNodeJump(featureKey) which switches the app to tree view and scrolls to the node. Clicking a node also calls centerOnNode which animates a D3 zoom/pan transition to bring the node to viewport centre at scale 1.8×. simulationRef and zoomRef persist across renders so focus changes and colorBy changes don't rebuild the simulation. focusKey change triggers centerOnNode if simulation is at rest, or queues a pendingCenterRef for the 'end' event (with a 700ms timeout fallback). The graph receives filteredFeatures from App so filter/search state is reflected in graph view. Expand-all and collapse-all buttons are shown in tree view only.",
+  "successCriteria": "Graph toggle shows a force-directed graph where: nodes are sized by completeness, draggable, and highlight adjacent edges on hover; clicking a node pins an info panel and pans the graph to centre on it; colorBy toggle switches between status palette and domain-clustered palette with cluster labels; Ctrl+click opens the node in tree view; the graph respects active filter state; mobile-width screens show a notice instead of the graph.",
   "domain": "ux",
   "schemaVersion": 1,
   "knownLimitations": [
     "No ResizeObserver — graph doesn't reflow on window resize without page reload",
     "features.find() is O(n) per D3 hover event — should be a pre-built Map for performance at scale",
-    "completeness_pct not on the Feature type — all nodes default to radius 50, same size regardless of completeness"
+    "Pinned panel position is fixed relative to click coordinates — can be clipped on small canvases",
+    "Cluster centre positions are computed once at simulation build time; adding/removing domains requires a rebuild"
   ],
-  "priority": 2
+  "priority": 2,
+  "statusHistory": [
+    {
+      "from": "frozen",
+      "to": "active",
+      "date": "2026-03-22",
+      "reason": "Graph view significantly enhanced: domain coloring (colorBy prop, cluster forces, cluster labels), pinned tooltip panel showing problem text, Ctrl+click to jump to tree view (onNodeJump), centerOnNode pan/zoom on click, faster simulation (alphaDecay=0.08), filter integration (graph now shows filteredFeatures), domain legend, resolved knownLimitation about completeness_pct"
+    },
+    {
+      "from": "active",
+      "to": "frozen",
+      "date": "2026-03-22"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "reopen-1774192068294",
+      "author": "lac advance",
+      "date": "2026-03-22",
+      "type": "reopen",
+      "body": "Graph view significantly enhanced: domain coloring (colorBy prop, cluster forces, cluster labels), pinned tooltip panel showing problem text, Ctrl+click to jump to tree view (onNodeJump), centerOnNode pan/zoom on click, faster simulation (alphaDecay=0.08), filter integration (graph now shows filteredFeatures), domain legend, resolved knownLimitation about completeness_pct"
+    }
+  ],
+  "revisions": [
+    {
+      "date": "2026-03-22",
+      "author": "claude",
+      "fields_changed": [
+        "implementation",
+        "successCriteria"
+      ],
+      "reason": "Graph view substantially enhanced: domain coloring, cluster forces/labels, pinned panel, onNodeJump, centerOnNode, filter integration, faster simulation. Removed resolved knownLimitation about completeness_pct."
+    },
+    {
+      "date": "2026-03-22",
+      "author": "claude",
+      "fields_changed": [
+        "analysis"
+      ],
+      "reason": "Analysis was never updated after reopen — it still described the original minimal graph. Updated to reflect domain coloring, colorBy prop, cluster forces/labels, pinned panel, Ctrl+click jump, centerOnNode, and filter integration. Also removed the stale-review annotation since all stale fields are now resolved."
+    }
+  ]
 }

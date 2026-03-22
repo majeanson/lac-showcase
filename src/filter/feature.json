@@ -1,0 +1,123 @@
+{
+  "featureKey": "feat-2026-028",
+  "title": "Filter Bar — Search, Tag, Status, Domain, Sort, and URL Sync",
+  "status": "frozen",
+  "problem": "The feature tree renders all 27 features at once with no way to search or narrow down — visitors looking for a specific tag, domain, or status must scroll the whole tree manually. Filter state is also not shareable via URL.",
+  "schemaVersion": 1,
+  "domain": "ux",
+  "tags": [
+    "filter",
+    "search",
+    "ux",
+    "navigation",
+    "url-state",
+    "chips"
+  ],
+  "lineage": {
+    "parent": "feat-2026-014",
+    "spawnReason": "scope split: add a FilterBar component above the tree/graph views that supports full-text search, tag/status/domain chip filters, priority sort, graph colorBy toggle, and expand/collapse all — all URL-synced via replaceState"
+  },
+  "analysis": "The FilterBar sits above the feature tree/graph and co-ordinates four independent filter axes: full-text search (featureKey, title, problem, analysis, implementation, successCriteria, tags, decisions), tag chips, status chips, and domain chips. Each axis is stored as URL-synced state (URLSearchParams via history.replaceState) so any filter combination is shareable and survives refresh. A collapsible panel keeps the UI compact — only the search input and a 'Filters N' button are always visible; chip rows appear on demand. When a filter is active, ancestor nodes of matching features are automatically added to treeFilterKeys so the tree retains lineage context instead of orphaning matches. Matching ancestors are also auto-expanded so results are immediately visible without manual unfolding. A sort control (tree order vs priority) and a graph colorBy control (status vs domain) live in the same panel to unify all view-control state in one place. Expand-all / collapse-all buttons appear in the tree toolbar. A match pill (e.g. '12 / 27') shows filtered vs total counts.",
+  "implementation": "FilterBar is a controlled React component receiving all filter state and callbacks from App. App manages: searchQuery (string), activeTags (Set<string>), activeStatuses (Set<string>), activeDomains (Set<string>), sortBy ('default'|'priority'), graphColorBy ('status'|'domain') — all initialised from URLSearchParams on mount and synced back in a single consolidated useEffect. filteredFeatures is derived via useMemo: for each feature, search query is matched against a concatenated hay string; tag/status/domain sets are ANDed. treeFilterKeys (Set<string>) extends filteredFeatures with all their ancestors so tree nodes that provide lineage context remain visible. A separate useEffect auto-deletes matched keys from collapsedKeys when a filter activates. allTags is derived by counting tag occurrences across all features and sorting by frequency descending (most-used first). allDomains is derived as a deduplicated, alphabetically-sorted list. FilterBar renders: a search <input type='search'>, an expand/open button with active-count badge, and a collapsible panel with Status / Domain / Tags / Sort / Color-by sections. Tag chips show count badges when count > 1; domain chips show count badges always. A '✕ Clear filters' button appears when any filter is active — it resets searchQuery, activeTags, activeStatuses, and activeDomains but does NOT reset sortBy or graphColorBy (those are view preferences, not filters). Expand-all / collapse-all buttons live in the view-toolbar (outside FilterBar) and are only shown in tree view. FeatureGraph receives filteredFeatures so graph view honours the same filter state.",
+  "decisions": [
+    {
+      "decision": "All filter axes stored in URL via history.replaceState",
+      "rationale": "Filter state is a meaningful reading position — sharing a URL with active filters lets collaborators see the same focused view without re-applying filters manually.",
+      "alternativesConsidered": [
+        "Component state only — not shareable, resets on navigation",
+        "localStorage — persists but not shareable across devices"
+      ],
+      "date": "2026-03-22"
+    },
+    {
+      "decision": "Collapsible panel: always-visible search + badge button, chips on demand",
+      "rationale": "Showing all chip rows permanently would consume 200px+ of vertical space above the tree. A single expand button with an active-count badge keeps the UI compact while signalling when filters are in effect.",
+      "alternativesConsidered": [
+        "Always-visible chips — takes too much vertical space",
+        "Separate filter page/modal — breaks spatial context with the tree"
+      ],
+      "date": "2026-03-22"
+    },
+    {
+      "decision": "Ancestor nodes of matches included in treeFilterKeys",
+      "rationale": "Filtering to only exact matches would orphan child features from their parents, breaking the lineage narrative. Including ancestors preserves tree shape while focusing the visible set.",
+      "alternativesConsidered": [
+        "Show only exact matches — hides lineage context",
+        "Show matches + full subtrees — too permissive, defeats the filter"
+      ],
+      "date": "2026-03-22"
+    },
+    {
+      "decision": "Sort and graph colorBy live in FilterBar, not separate controls",
+      "rationale": "These are view-control options that belong alongside filter options — they affect what the user sees and how, which is the same semantic category as filters.",
+      "alternativesConsidered": [
+        "Separate sort button next to tree/graph toggle — scatters related controls",
+        "Always sort by priority — removes user agency"
+      ],
+      "date": "2026-03-22"
+    }
+  ],
+  "successCriteria": "Typing in the search box filters the tree in real-time; matching features and their ancestors remain visible while non-matching branches disappear. Tag, status, and domain chips toggle filter axes independently. Sort 'priority' reorders the tree by P1–P5; 'tree order' restores insertion order. Graph colorBy switches node colours between status palette and domain-hue palette. filter/sort/colorBy state is reflected in the URL and survives page reload. A match pill shows 'N / 27' when any filter is active. '✕ Clear filters' resets search and chip filters but preserves sort and colorBy preferences.",
+  "knownLimitations": [
+    "Filter is applied to the flat allFeatures list — a feature deeply nested under a non-matching ancestor is still shown if it matches, which can produce out-of-context results in priority-sort mode",
+    "No debounce on search input — re-filters on every keystroke (acceptable at 29 features, may need debounce at scale)",
+    "Expand-all / collapse-all are not persisted in URL — collapse state resets on reload",
+    "colorBy and sortBy are only visible in FilterBar panel when the relevant view is active — easy to miss when switching views",
+    "clearFilters() does not reset sortBy or graphColorBy — users must manually change these in the panel"
+  ],
+  "priority": 2,
+  "revisions": [
+    {
+      "date": "2026-03-22",
+      "author": "claude",
+      "fields_changed": [
+        "analysis",
+        "implementation",
+        "decisions",
+        "successCriteria"
+      ],
+      "reason": "Initial field population — FilterBar fully implemented in App.tsx; all fields authored from code inspection"
+    },
+    {
+      "date": "2026-03-22",
+      "author": "claude",
+      "fields_changed": [
+        "implementation",
+        "successCriteria"
+      ],
+      "reason": "Fixed two inaccuracies: clearFilters() does not reset sortBy/graphColorBy (they persist as view preferences); allTags sorted by frequency descending and allDomains sorted alphabetically — both now documented in implementation. Updated successCriteria to match actual clear behavior. Updated feature count in KL from 27 to 29."
+    }
+  ],
+  "statusHistory": [
+    {
+      "from": "draft",
+      "to": "active",
+      "date": "2026-03-22"
+    },
+    {
+      "from": "active",
+      "to": "frozen",
+      "date": "2026-03-22"
+    },
+    {
+      "from": "frozen",
+      "to": "active",
+      "date": "2026-03-22",
+      "reason": "Two inaccuracies: clearFilters() does not reset sortBy or graphColorBy (those persist across clear); tag list is sorted by frequency descending, domain list alphabetically — both omitted from implementation."
+    },
+    {
+      "from": "active",
+      "to": "frozen",
+      "date": "2026-03-22"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "reopen-1774192363979",
+      "author": "lac advance",
+      "date": "2026-03-22",
+      "type": "reopen",
+      "body": "Two inaccuracies: clearFilters() does not reset sortBy or graphColorBy (those persist across clear); tag list is sorted by frequency descending, domain list alphabetically — both omitted from implementation."
+    }
+  ]
+}

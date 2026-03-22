@@ -6,17 +6,68 @@
   "schemaVersion": 1,
   "analysis": "The feature.json files are the implementation spec; each feature's status field drives the work queue. The sprint works through every active feature in dependency order — design tokens first, then app shell improvements, About section, ecosystem features, lineage collapse, then focus/navigation mode. Each feature becomes a testable increment verified against its successCriteria.",
   "decisions": [
-    {"decision": "Work in dependency order, not feature-key order","rationale": "Design tokens must land before component styling, and collapse behaviour must land before focus mode builds on top of it — building out of order creates rework.","alternativesConsidered": ["Alphabetical/key order — ignores dependencies","All at once — impossible to test incrementally"],"date": "2026-03-21"},
-    {"decision": "Use each feature's successCriteria as the acceptance test","rationale": "successCriteria was written to be specific and testable — using it as the definition of done closes the loop between documentation and implementation.","alternativesConsidered": ["Ad-hoc testing — no clear completion signal","Separate test spec — duplicates what's already in feature.json"],"date": "2026-03-21"},
-    {"decision": "successCriteria rendered in the expanded card view","rationale": "Makes the app self-describing — visitors can see not just what was built but how we knew it was done.","alternativesConsidered": ["Only internal / not rendered — wastes the field for showcase purposes"],"date": "2026-03-21"},
-    {"decision": "types.ts extended with successCriteria and domain fields","rationale": "Both fields are present in feature.json files — exposing them in the TypeScript interface ensures they render and are type-checked at build time.","alternativesConsidered": ["Keep types narrow, access via JSON cast — loses type safety"],"date": "2026-03-21"},
-    {"decision": "features.ts dead code (byKey, rooted variables) removed during integration","rationale": "The integration sprint is the natural point to fix known issues already documented in feat-2026-002's knownLimitations.","alternativesConsidered": ["Leave it — tech debt grows; knownLimitations already called it out"],"date": "2026-03-21"}
+    {
+      "decision": "Work in dependency order, not feature-key order",
+      "rationale": "Design tokens must land before component styling, and collapse behaviour must land before focus mode builds on top of it — building out of order creates rework.",
+      "alternativesConsidered": [
+        "Alphabetical/key order — ignores dependencies",
+        "All at once — impossible to test incrementally"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "Use each feature's successCriteria as the acceptance test",
+      "rationale": "successCriteria was written to be specific and testable — using it as the definition of done closes the loop between documentation and implementation.",
+      "alternativesConsidered": [
+        "Ad-hoc testing — no clear completion signal",
+        "Separate test spec — duplicates what's already in feature.json"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "successCriteria rendered in the expanded card view",
+      "rationale": "Makes the app self-describing — visitors can see not just what was built but how we knew it was done.",
+      "alternativesConsidered": [
+        "Only internal / not rendered — wastes the field for showcase purposes"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "types.ts extended with successCriteria and domain fields",
+      "rationale": "Both fields are present in feature.json files — exposing them in the TypeScript interface ensures they render and are type-checked at build time.",
+      "alternativesConsidered": [
+        "Keep types narrow, access via JSON cast — loses type safety"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "features.ts dead code (byKey, rooted variables) removed during integration",
+      "rationale": "The integration sprint is the natural point to fix known issues already documented in feat-2026-002's knownLimitations.",
+      "alternativesConsidered": [
+        "Leave it — tech debt grows; knownLimitations already called it out"
+      ],
+      "date": "2026-03-21"
+    }
   ],
   "implementation": "Integration order: (1) feat-2026-003 CSS design tokens, (2) feat-2026-002 About component wired into App.tsx, (3) feat-2026-004 About section styled, (4) feat-2026-006..013 ecosystem features in tree, (5) feat-2026-005 collapse/expand, (6) feat-2026-014 focus mode via ?focus= URL param. Each increment verified against successCriteria before proceeding.",
-  "knownLimitations": ["No automated test suite — successCriteria verification is manual visual inspection"],
+  "knownLimitations": [
+    "No automated test suite — successCriteria verification is manual visual inspection"
+  ],
   "successCriteria": "Every active feature renders correctly in the running app with design tokens applied, About section above the feature list, working collapse/expand, working focus mode via ?focus=, and the ecosystem sub-tree fully navigable.",
-  "tags": ["integration","sprint","implementation","all-features"],
-  "lineage": {"parent": "feat-2026-002","spawnReason": "The app shell gave a runnable scaffold; this sprint wires every designed feature into the live app.","children": ["feat-2026-019"]},
+  "tags": [
+    "integration",
+    "sprint",
+    "implementation",
+    "all-features"
+  ],
+  "lineage": {
+    "parent": "feat-2026-002",
+    "spawnReason": "The app shell gave a runnable scaffold; this sprint wires every designed feature into the live app.",
+    "children": [
+      "feat-2026-019",
+      "feat-2026-029"
+    ]
+  },
   "domain": "frontend",
   "priority": 3
 }

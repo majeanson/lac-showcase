@@ -1,5 +1,20 @@
 import type { Feature, FeatureNode } from './types'
 
+// Score how complete a feature.json is (0–100) based on optional fields present
+export function completenessOf(f: Feature): number {
+  const checks = [
+    !!f.analysis,
+    !!f.implementation,
+    !!(f.decisions && f.decisions.length > 0),
+    !!f.successCriteria,
+    !!(f.knownLimitations && f.knownLimitations.length > 0),
+    !!(f.tags && f.tags.length > 0),
+    !!f.domain,
+  ]
+  const score = checks.filter(Boolean).length / checks.length
+  return Math.round(score * 100)
+}
+
 // Load all feature.json files in the project at build time
 const modules = import.meta.glob<{ default: Feature }>(
   '../**/feature.json',

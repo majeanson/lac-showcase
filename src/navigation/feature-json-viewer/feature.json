@@ -1,0 +1,103 @@
+{
+  "featureKey": "feat-2026-027",
+  "title": "Feature JSON Viewer — Inline Code Toggle on Cards",
+  "status": "frozen",
+  "problem": "No way to inspect the raw feature.json from the UI — developers and curious users have no quick path from a card to its underlying structured data. The \"show children\" and \"focus\" toggles sit on each card with no equivalent for the data layer.",
+  "schemaVersion": 1,
+  "domain": "ux",
+  "tags": [
+    "json-viewer",
+    "code-toggle",
+    "card",
+    "ux",
+    "developer-tools",
+    "navigation",
+    "focus"
+  ],
+  "lineage": {
+    "parent": "feat-2026-016",
+    "spawnReason": "scope split: add per-card code viewer toggle that reveals feature.json in a styled code block, positioned alongside the existing show-children and focus actions"
+  },
+  "analysis": "This feature adds a per-card JSON inspection toggle to the existing card action row — sitting alongside the 'show children' and 'focus' controls introduced in feat-2026-016. Each card independently tracks a boolean open/closed state so multiple viewers can be expanded simultaneously without global side-effects. When toggled open, the card renders the full feature.json payload in a styled code block below the card header, using a monospace font and a dark editor-style background to signal 'this is data, not prose'. The toggle button uses a compact icon or short label (e.g. `{ }`) to keep the action row uncluttered. State lives locally in the card component via a simple useState hook — no context or global store involvement. The JSON is rendered read-only via a <pre><code> block with JSON.stringify(feature, null, 2) formatting; no external editor library is required. The panel animates open/closed to avoid a jarring layout shift. This approach deliberately avoids pulling in Monaco or CodeMirror, keeping the bundle lean while still delivering a clear developer-oriented affordance. The feature is scoped to display only — no editing, no clipboard, no diffing — keeping first-pass complexity minimal.",
+  "implementation": "No separate component file — implemented inline in App.tsx's FeatureCard function. A `jsonOpen` boolean useState is added to each card's local state alongside the existing `open` state. A fourth icon button '{ json }' / '{ close }' is rendered in the existing card-footer-actions row after the focus and graph buttons. When toggled open, a .json-viewer div renders below the card body containing a label line and a <pre><code> block populated with JSON.stringify(feature, null, 2) (with the depth field stripped via destructuring). The json-viewer panel has a dark-background, small monospace text, and a scrollable overflow. State is fully local per card — no lifted state, no context involvement. The src/navigation/feature-json-viewer/ directory contains only the feature.json tracking this feature; the code lives in App.tsx.",
+  "decisions": [
+    {
+      "decision": "Local useState per card rather than global/context state",
+      "rationale": "Each card is already a self-contained unit; lifting toggle state would add unnecessary complexity and couple cards together. Independent toggles mean multiple JSONs can be open at once without coordination.",
+      "alternativesConsidered": [
+        "global viewer state via context",
+        "URL-param driven open state"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "Read-only <pre><code> block instead of a full code editor (Monaco/CodeMirror)",
+      "rationale": "The goal is inspection, not editing. A full editor adds ~300KB+ to the bundle and brings IME/focus complexity. A styled pre block is zero-dependency and sufficient for JSON display.",
+      "alternativesConsidered": [
+        "Monaco Editor",
+        "CodeMirror 6",
+        "react-json-view"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "Inline collapsible panel below card header, not a modal or drawer",
+      "rationale": "Keeps the user in spatial context — they see the card label and its JSON together without a layer change. Modal would break the scannable tree layout.",
+      "alternativesConsidered": [
+        "modal overlay",
+        "side drawer",
+        "tooltip popover"
+      ],
+      "date": "2026-03-21"
+    },
+    {
+      "decision": "Position toggle as third action in existing action row (after show-children, focus)",
+      "rationale": "Consistent with the established left-side actions pattern from feat-2026-016. Avoids introducing a new affordance zone and keeps all card controls discoverable in one spot.",
+      "alternativesConsidered": [
+        "separate info icon in card header",
+        "right-click context menu"
+      ],
+      "date": "2026-03-21"
+    }
+  ],
+  "knownLimitations": [
+    "No syntax highlighting — JSON is rendered as plain monospace text; colour tokens would require a library or a custom regex highlighter",
+    "No copy-to-clipboard button in initial scope; power users will need to select-all manually",
+    "Large feature.json files (e.g. ones with long analysis text) produce tall panels that push sibling cards far down — no truncation or virtual scroll implemented",
+    "Mobile action row becomes crowded with three toggle buttons; no responsive collapse strategy defined yet"
+  ],
+  "successCriteria": "Every feature card in the lineage tree and focus view shows a '{ }' toggle button alongside 'show children' and 'focus'. Clicking it reveals the full formatted feature.json in a dark code-style panel; clicking again collapses it cleanly. Multiple cards can have their viewers open simultaneously with no visual interference between them.",
+  "revisions": [
+    {
+      "date": "2026-03-22",
+      "author": "claude",
+      "fields_changed": [
+        "analysis",
+        "implementation",
+        "decisions",
+        "successCriteria"
+      ],
+      "reason": "Initial field population after spawn — analysis, decisions, implementation, knownLimitations, successCriteria authored from feature intent and parent lineage context"
+    },
+    {
+      "date": "2026-03-22",
+      "author": "claude",
+      "fields_changed": [
+        "implementation"
+      ],
+      "reason": "Implementation was described as a separate component but the actual code is inline in App.tsx FeatureCard. No .tsx file exists in src/navigation/feature-json-viewer/. Updated to accurately describe the inline implementation location and actual rendering code."
+    }
+  ],
+  "statusHistory": [
+    {
+      "from": "draft",
+      "to": "active",
+      "date": "2026-03-22"
+    },
+    {
+      "from": "active",
+      "to": "frozen",
+      "date": "2026-03-22"
+    }
+  ]
+}

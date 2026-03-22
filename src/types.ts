@@ -25,6 +25,7 @@ export interface Feature {
   owner?: string
   successCriteria?: string
   domain?: string
+  priority?: number
 }
 
 export interface FeatureNode extends Feature {
