@@ -112,8 +112,13 @@ lac lint
 
 ---
 
-## Learn more
+## The toolchain
 
-- **LAC CLI** — [npmjs.com/package/@majeanson/lac](https://www.npmjs.com/package/@majeanson/lac)
-- **lac-lens VS Code extension** — [marketplace.visualstudio.com](https://marketplace.visualstudio.com/items?itemName=majeanson.lac-lens)
-- **lifeascode web app** — the hosted version of the same workflow at scale
+| package | what it is | link |
+|---|---|---|
+| `@majeanson/lac` | CLI — scaffold features, fill with AI, inspect lineage. Runs via `npx`. | [npm →](https://www.npmjs.com/package/@majeanson/lac) |
+| `lac-lens` | VS Code extension — CodeLens annotations, hover cards, sidebar explorer. | [marketplace →](https://marketplace.visualstudio.com/items?itemName=majeanson.lac-lens) |
+| `lac-mcp` | MCP server — exposes your feature workspace to Claude, Cursor, any MCP host. | bundled with CLI |
+| `lifeascode` | Web app — browse features, visualise lineage trees, timeline of decisions. | [live demo →](https://lifeascode-ruddy.vercel.app/) |
+| `feature-schema` | Canonical schema — single Zod source of truth across CLI, LSP, MCP, web app. | bundled |
+| `lac-lsp` | Language server — real-time validation in any LSP-compatible editor. | bundled |
