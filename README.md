@@ -168,6 +168,16 @@ lac lint
 
 ---
 
+## Reconstruction companion
+
+[**lac-showcase-reconstruction**](https://github.com/majeanson/lac-showcase-reconstruction) is this app rebuilt entirely from its own `feature.json` files — no source code used.
+
+The pipeline: extract all feature.jsons → `lac export --prompt` → strip `src/` → AI reconstructs from the spec alone.
+
+Live result: **https://lac-showcase-reconstruction.vercel.app/**
+
+---
+
 ## The toolchain
 
 | package | what it is | link |
